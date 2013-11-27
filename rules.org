@@ -1,0 +1,98 @@
+* Rules
+
+** Board
+19 tiles
+mountain: 3
+forest: 4
+hills: 3
+field: 4
+pasture: 4
+desert: 1
+
+9 harbours
+
+size: 3 x 3
+(explorers & pirates: 4 x 9
+
+*** Spaces - 19
+type
+roll
+robber
+
+*** Vertices
+
+
+
+** Spaces
+A5 B2 C6 D3 E8 F10 G9 H12 I11 J4 K8 L10 M9 N4 O5 P6 Q3 R11
+
+** Players
+5 settlements
+4 cities
+15 roads
+dev cards (hand)
+dev cards (played)
+resources
+
+** Resources
+wool
+brick
+wood
+ore
+grain
+
+** Things
+*** Settlement
+cost: 1 wool 1 grain 1 brick 1 wood
+1 point
+1 resource
+**** Special
+2 edge rule
+
+*** City
+cost: 2 grain 3 ore
+2 points
+2 resources
+**** Special
+existing settlement
+
+*** Road
+cost: 1 brick 1 wood
+**** special
+no road there, connected
+
+*** Card
+1 ore 1 grain 1 wood
+
+** Cards
+*** Knight
+14
+Move robber, steal resouce
+3+ largest army
+
+*** Road building
+2
+2 roads
+
+*** Year of plenty
+2
+Any 2 resources
+
+*** Monopoly
+2
+All resources of type
+
+*** VP cards
+5
+1 point
+
+
+
+** Turn
+*** Resource production
+- roll
+- give resources
+
+*** Trade
+
+*** Build
