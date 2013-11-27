@@ -1,4 +1,4 @@
-(ns ^:shared settlers.grid)
+(ns ^:shared settlers.map)
 
 (defn a2c [[q r]]
   "Axial co-ords to cube co-ords"
