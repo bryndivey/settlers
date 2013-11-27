@@ -27,13 +27,14 @@
   "Get a qr face"
   (get-q (get-q g q) r))
 
+(defn face-neighbours [[q r]]
+  (for [[q' r'] [[1 0] [1 -1] [0 -1] [-1 0] [-1 1] [0 1]]]
+    [(+ q q') (+ r r')]))
+
 (defn get-neighbours 
   "Get the neighbouring faces of a [q r] face"
-  ([[q r]]
-     (for [[q' r'] [[1 0] [1 -1] [0 -1] [-1 0] [-1 1] [0 1]]]
-       [(+ q q') (+ r r')]))
-  ([g p]
-     (filter identity (map (partial get-qr g) (get-neighbours p)))))
+  [g p]
+  (filter identity (map (partial get-qr g) (face-neighbours p))))
 
 (defn distance [[q1 r1] [q2 r2]]
   "Distance between two faces"
@@ -48,4 +49,16 @@
     (assoc-in g i v)))
 
 
+;; vertices
+;; face + n/w 
+
+(defn vertex-neighbours [[[q r] d]]
+  (cond (= d :n) [[[q r] :w] [[(+ q 1) r] :w] [[(+ q 1) (- r 1)] :w]]
+        (= d :w) [[[q r] :n] [[(- q 1) r] :n] [[(- q 1) (+ r 1)] :n]]
+        :else (throw (Exception. (str "Invalid direction" d)))))
+
+(defn vertex-to-faces [[[q r] d]]
+  (cond (= d :n) [[q r] [q (- r 1)] [(+ q 1) (- r 1)]]
+        (= d :w) [[q r] [(- q 1) r] [q (- r 1)]]
+        :else (throw (Exception. (str "Invalid direction" d)))))
 
