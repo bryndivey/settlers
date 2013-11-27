@@ -4,7 +4,7 @@
 
 
 
-(def test-face-map-1
+(def test-map-1
   [[nil :pasture :hill]
    [:hill :field :mountain]
    [:forest :hill nil]])

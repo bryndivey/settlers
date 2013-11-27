@@ -11,21 +11,21 @@
   "Cube co-ords to axial co-ords"
   [x z])
 
-(defn- norm-pos [g i]
+(defn- norm-pos [m i]
   "Normalize offset to absolute position"
-  (+ (/ (- (count g) 1) 2) i))
+  (+ (/ (- (count m) 1) 2) i))
 
-(defn get-q [g q]
+(defn get-q [m q]
   "Get a q face slice from a grid"
-  (get g (norm-pos g q)))
+  (get m (norm-pos m q)))
 
-(defn get-r [g r]
+(defn get-r [m r]
   "Get an r face slice from a grid"
-  (map #(get % (norm-pos g r))))
+  (map #(get % (norm-pos m r)) m))
 
-(defn get-qr [g [q r]]
+(defn get-qr [m [q r]]
   "Get a qr face"
-  (get-q (get-q g q) r))
+  (get-q (get-q m q) r))
 
 (defn face-neighbours [[q r]]
   (for [[q' r'] [[1 0] [1 -1] [0 -1] [-1 0] [-1 1] [0 1]]]
@@ -33,8 +33,8 @@
 
 (defn get-neighbours 
   "Get the neighbouring faces of a [q r] face"
-  [g p]
-  (filter identity (map (partial get-qr g) (face-neighbours p))))
+  [m p]
+  (filter identity (map (partial get-qr m) (face-neighbours p))))
 
 (defn distance [[q1 r1] [q2 r2]]
   "Distance between two faces"
@@ -44,9 +44,9 @@
           (abs (- (+ q1 r1) q2 r2)))
        2)))
 
-(defn set-qr [g [q r] v]
-  (let [i (map (partial norm-pos g) [q r])]
-    (assoc-in g i v)))
+(defn set-qr [m [q r] v]
+  (let [i (map (partial norm-pos m) [q r])]
+    (assoc-in m i v)))
 
 
 ;; vertices
