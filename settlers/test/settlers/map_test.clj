@@ -4,12 +4,12 @@
 
 
 
-(def test-map-1
+(def test-face-map-1
   [[nil :pasture :hill]
    [:hill :field :mountain]
    [:forest :hill nil]])
 
-(deftest test-map-funcs
+(deftest test-face-map-funcs
   ;; q rows
   (is (= [nil :pasture :hill] (get-q test-map-1 -1)))
   (is (= [:hill :field :mountain] (get-q test-map-1 0)))
@@ -31,10 +31,7 @@
   (is (= (set [:hill :field :hill])
          (set (get-neighbours test-map-1 [-1 0]))))
   (is (= (set [:hill :mountain])
-         (set (get-neighbours test-map-1 [1 1]))))  
-  
-  )
-
+         (set (get-neighbours test-map-1 [1 1])))))
 
 
 
