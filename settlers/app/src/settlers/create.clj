@@ -80,5 +80,9 @@
         (update-in [:player-order] conj (:id p)))))
 
 (defn add-settlement [game player vertex]
+  (assert ((-> game :players keys set) player) (str "No such player " player))
+  (assert (not ((:vertices game) vertex)) (str "Already a settlement there: "
+                                               ((:vertices game) vertex)))
   (assoc-in game [:vertices vertex] {:type :settlement
-                                     :owner (:id player)}))
+                                     :position vertex
+                                     :owner player}))

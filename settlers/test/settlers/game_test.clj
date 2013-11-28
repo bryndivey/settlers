@@ -19,3 +19,12 @@
     (is (= (tiles-for-vertex g [[2 -2] :w])
            '({:terrain :mountain, :roll 6} {:terrain :pasture, :roll 2})))
     ))
+
+
+(def g (-> game
+           (create/add-player "Bryn")
+           (create/add-player "Mark")
+           (create/add-settlement :bryn [[0 0] :n])
+           (create/add-settlement :bryn [[-2 2] :n])
+           (create/add-settlement :mark [[1 1] :n])
+           (create/add-settlement :mark [[-1 0] :w])))

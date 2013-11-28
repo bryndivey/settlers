@@ -25,43 +25,45 @@
 ; find settlements per tile
 
 (defn tiles-with-settlements [g]
-  "get a list of tuples of tiles and settlements"
-  (for [[v s] (:vertices g)]
-    [(map/vertex-to-faces v) s]))
+  "return a list of tiles "
+  (for [[v s] (:vertices g)
+        f (map/vertex-to-faces v)]
+    [f s]))
 
+(defn resource-for-terrain [g t]
+  (t {:mountain :ore
+      :field :wheat
+      :forest :wood
+      :hill :brick
+      :pasture :wool}))
+
+(defn num-resources-for-settlement [g s]
+  ((:type s) {:settlement 1
+              :city 2}))
 
 (defn allocate-for-settlement-and-tile [g [s t]]
   "give the owner of s appropriate resources for t"
-  (println "S T" s t)
-  (let [r ({:mountain :ore
-            :field :wheat
-            :forest :wood
-            :hill :brick
-            :pasture :wool} (:terrain t))
-        n (if (= (:type s) :settlement)
-            1
-            2)]
-    (println "GIVING" (:owner s) n r)
+  (let [r (resource-for-terrain g (:terrain t))
+        n (num-resources-for-settlement g s)]
+    (assert r (str "Invalid terrain" (:terrain t)))
+    (assert n (str "Invalid settlement" s))
+
     (update-in g [:players (:owner s) :resources r] + n)))
 
-(defn allocate-resource [g t]
+(defn allocate-for-tile [g t]
   "Takes a tile and a game and figures out who gets stuff"
-  (let [tws (tiles-with-settlements g)
-        pos (:position t)
-        s-a-ts (for [[t' s] tws
-]
-                 [s t])]
-    (println "SATS" s-a-ts)
-    (reduce allocate-resource g s-a-ts)))
+  (let [pos (:position t)
+        s-and-ts (for [[p s] (tiles-with-settlements g)
+                       :when (= pos p)]
+                   [s t])]
+    (reduce allocate-for-settlement-and-tile g s-and-ts)))
 
 (defn resource-turn [g p]
   (let [r (r2d)
-        t (tiles-for-roll g r)
-        tws (tiles-with-settlements g)]
+        t (tiles-for-roll g r)]
     (println "Roll" r)
     (println "Tiles" t)
-    (map (partial allocate-resource g) t)
-    ))
+    (reduce allocate-for-tile g t)))
 
 
 
