@@ -49,7 +49,7 @@
 
 
 ;; TODO - hardcoded vals
-(defn create-map []
+(defn -create-map [terrains]
   (let [map (vec (repeat 5 (vec (repeat 5 nil))))
         lfn (fn [m [next-pos & ps] [next-terrain & ts] rs]
               (if (nil? next-pos)
@@ -60,13 +60,17 @@
                   (recur (set-qr m next-pos {:terrain next-terrain
                                              :roll next-roll})
                          ps ts rs))))]
-    (lfn map positions (shuffle terrains) rolls)))
+    (lfn map positions terrains rolls)))
 
 
-(defn create-game []
-  {:map (create-map)
+(defn -create-game [terrains]
+  {:map (-create-map terrains)
+   :vertices {}
    :players {}
    :player-order []})
+
+(defn create-game []
+  (-create-game (shuffle terrains)))
 
 (defn add-player [g name]
   (let [p (create-player name)]
