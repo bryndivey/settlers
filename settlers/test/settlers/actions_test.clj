@@ -1,5 +1,6 @@
 (ns settlers.actions-test
   (:require [clojure.test :refer :all]
+            [settlers.utils :refer :all]
             [settlers.create :as create]
             [settlers.game :refer :all]
             [settlers.actions :refer :all]))
@@ -9,8 +10,11 @@
 (def g (-> (create/-create-game terrains)
            (create/add-player "Bryn")
            (create/add-settlement :bryn [[0 0] :n])
-           (create/add-settlement :bryn [[-2 2] :n])))
+           (create/add-settlement :bryn [[-2 2] :n])
+           (inc-resources :bryn {:wood 1 :wool 1 :brick 1 :grain 1})))
 
 (deftest t-v-settlement
   (is (= true (v-settlement-location g [[0 0] :n])))
   (is (= false (v-settlement-location g [[-1 -1] :n]))))
+
+
