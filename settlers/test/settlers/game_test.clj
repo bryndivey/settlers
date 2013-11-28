@@ -10,4 +10,12 @@
 (deftest t-basic
   (let [g (-> game
               (create/add-player "Bryn"))]
-    (println g)))
+    (is (= (tiles-for-vertex g [[0 0] :n])
+           '({:terrain :forest, :roll 11} {:terrain :forest, :roll 10} {:terrain :hill, :roll 9})))
+
+    (is (= (tiles-for-vertex g [[-2 3] :w])
+           '({:terrain :field, :roll 12})))
+
+    (is (= (tiles-for-vertex g [[2 -2] :w])
+           '({:terrain :mountain, :roll 6} {:terrain :pasture, :roll 2})))
+    ))

@@ -7,8 +7,8 @@
      :name name
      :resources {:wood 0
                  :ore 0
-                 :grain 0
-                 :sheep 0
+                 :wheat 0
+                 :wool 0
                  :brick 0}
      :hand []
      :cards []
@@ -58,7 +58,8 @@
                       next-roll (if desert nil (first rs))
                       rs (if desert rs (rest rs))]
                   (recur (set-qr m next-pos {:terrain next-terrain
-                                             :roll next-roll})
+                                             :roll next-roll
+                                             :position next-pos})
                          ps ts rs))))]
     (lfn map positions terrains rolls)))
 
@@ -77,3 +78,7 @@
     (-> g 
         (assoc-in [:players (:id p)] p)
         (update-in [:player-order] conj (:id p)))))
+
+(defn add-settlement [game player vertex]
+  (assoc-in game [:vertices vertex] {:type :settlement
+                                     :owner (:id player)}))
