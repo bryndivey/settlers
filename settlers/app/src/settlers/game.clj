@@ -58,12 +58,13 @@
                    [s t])]
     (reduce allocate-for-settlement-and-tile g s-and-ts)))
 
+(defn do-resource-allocation [g r]
+  "Takes a game and a roll and does resources"
+  (reduce allocate-for-tile g (tiles-for-roll g r)))
+
 (defn resource-turn [g p]
-  (let [r (r2d)
-        t (tiles-for-roll g r)]
-    (println "Roll" r)
-    (println "Tiles" t)
-    (reduce allocate-for-tile g t)))
+  (let [r (r2d)]
+    (do-resource-allocation g r)))
 
 
 

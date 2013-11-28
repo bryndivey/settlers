@@ -28,3 +28,8 @@
            (create/add-settlement :bryn [[-2 2] :n])
            (create/add-settlement :mark [[1 1] :n])
            (create/add-settlement :mark [[-1 0] :w])))
+
+(deftest t-resources
+  (is (= '({:brick 1, :wood 0, :ore 0, :wool 0, :wheat 1}
+           {:brick 0, :wood 0, :ore 0, :wool 0, :wheat 0})
+         (map :resources (vals (:players (do-resource-allocation g 8)))))))
