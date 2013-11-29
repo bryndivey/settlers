@@ -2,7 +2,8 @@
     (:require [settlers.utils :refer [has-at-least? dec-resources
                                       g-p]]
               [settlers.map :refer [vertex-to-faces]]
-              [settlers.create :refer [add-settlement]]))
+              [settlers.create :refer [add-settlement
+                                       add-road]]))
 
 (def action-fns (atom {}))
 
@@ -80,12 +81,31 @@
     (has-at-least? p r-map)))
 
 
-(defaction :build-settlement
-  :validate-fns [v-settlement-location
-                 (v-required-resources {:wood 1 :wool 1 :brick 1 :grain 1})
-                 (v-building-number :settlement 5)]
-  :perform-fn (fn [g p a]
-                (-> g
-                    (add-settlement (:id p) (:target a))
-                    (dec-resources (:id p) {:wood 1 :wool 1 :brick 1 :grain 1}))))
+(let [cost {:wood 1 :wool 1 :brick 1 :grain 1}]
+  (defaction :build-settlement
+    :validate-fns [v-settlement-location
+                   (v-required-resources cost )
+                   (v-building-number :settlement 5)]
+    :perform-fn (fn [g p a]
+                  (-> g
+                      (add-settlement (:id p) (:target a))
+                      (dec-resources (:id p) cost)))))
+
+
+
+
+;; road building
+
+(defn v-road-location [g p a]
+  true)
+
+(let [cost {:wood 1 :brick 1}]
+  (defaction :build-road
+    :validate-fns [v-road-location
+                   (v-required-resources cost)
+                   (v-building-number :road 15)]
+    :perform-fn (fn [g p a]
+                  (-> g
+                      (add-road (:id p) (:target a))
+                      (dec-resources (:id p) cost)))))
 

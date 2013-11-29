@@ -67,6 +67,8 @@
 (defn -create-game [terrains]
   {:map (-create-map terrains)
    :vertices {}
+   :edges {}
+   :moves []
    :players {}
    :player-order []})
 
@@ -80,9 +82,11 @@
         (update-in [:player-order] conj (:id p)))))
 
 (defn add-settlement [game player vertex]
-  (assert ((-> game :players keys set) player) (str "No such player " player))
-  (assert (not ((:vertices game) vertex)) (str "Already a settlement there: "
-                                               ((:vertices game) vertex)))
   (assoc-in game [:vertices vertex] {:type :settlement
                                      :position vertex
                                      :owner player}))
+
+(defn add-road [game player edge]
+  (assoc-in game [:edges edge] {:type :road
+                                :position edge
+                                :owner player}))

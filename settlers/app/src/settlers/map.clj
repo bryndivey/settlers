@@ -62,3 +62,19 @@
         (= d :w) [[q r] [(- q 1) r] [q (- r 1)]]
         :else (throw (Exception. (str "Invalid direction" d)))))
 
+;; edges
+;; edges are two faces, which are a q and r each
+
+(defn e-dir [[[q1 r1] [q2 r2]]]
+  "get the 'direction' of a face"
+  (cond
+   (= r1 r2) :x
+   (= q1 q2) :y
+   (= (+ q1 r1) (+ q2 r2)) :z))
+
+(defn e-opposite-tiles [[[q1 r1] [q2 r2]]]
+  "get the 'opposite' tiles to find neighbouring edges"
+  (case (e-dir [[q1 r1] [q2 r2]])
+    :x [[q1 (+ r1 1)] [q2 (- r2 1)]]
+    :y [[(- q1 1) (+ r1 1)] [(+ q2 1) (- r2 1)]]
+    :z [[q1 (- r1 1)] [q2 (+ r2 1)]]))
