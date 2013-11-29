@@ -1,7 +1,8 @@
 (ns ^:shared settlers.actions
     (:require [settlers.utils :refer [has-at-least? dec-resources
                                       g-p]]
-              [settlers.map :refer [vertex-to-faces]]
+              [settlers.map :refer [vertex-to-faces
+                                    e-neighbours]]
               [settlers.create :refer [add-settlement
                                        add-road]]))
 
@@ -97,7 +98,11 @@
 ;; road building
 
 (defn v-road-location [g p a]
-  true)
+  "Get the neighbours for the edge and ensure one is a road belonging to the player"
+  (let [neighbours (e-neighbours (:target a))
+        player-roads (filter #(= (:id p) (:owner %)) (vals (:edges g)))]
+    (println neighbours)
+    (println player-roads)))
 
 (let [cost {:wood 1 :brick 1}]
   (defaction :build-road

@@ -11,6 +11,7 @@
            (create/add-player "Bryn")
            (create/add-settlement :bryn [[0 0] :n])
            (create/add-settlement :bryn [[-2 2] :n])
+           (create/add-road :bryn #{[-1 0] [0 0]})
            (inc-resources :bryn {:wood 1 :wool 1 :brick 1 :grain 1})))
 
 (deftest t-v-settlement

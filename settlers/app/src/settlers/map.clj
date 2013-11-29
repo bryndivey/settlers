@@ -65,14 +65,19 @@
 ;; edges
 ;; edges are two faces, which are a q and r each
 
-(defn e-dir [[[q1 r1] [q2 r2]]]
-  "get the 'direction' of a face"
-  (cond
-   (= r1 r2) :x
-   (= q1 q2) :y
-   (= (+ q1 r1) (+ q2 r2)) :z))
+(defn order-e [e]
+  "Order set e into vector on q ordering"
+  (sort-by first (vec e)))
 
-(defn e-opposite-tiles [[[q1 r1] [q2 r2]]]
+(defn e-dir [e]
+  "get the 'direction' of a face"
+  (let [[[q1 r1] [q2 r2]] (order-e e)]
+    (cond
+     (= r1 r2) :x
+     (= q1 q2) :y
+     (= (+ q1 r1) (+ q2 r2)) :z)))
+
+(defn e-opposite-tiles [e]
   "get the 'opposite' tiles to find neighbouring edges"
   (case (e-dir [[q1 r1] [q2 r2]])
     :x [[q1 (+ r1 1)] [q2 (- r2 1)]]
