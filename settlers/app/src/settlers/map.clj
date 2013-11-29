@@ -78,3 +78,8 @@
     :x [[q1 (+ r1 1)] [q2 (- r2 1)]]
     :y [[(- q1 1) (+ r1 1)] [(+ q2 1) (- r2 1)]]
     :z [[q1 (- r1 1)] [q2 (+ r2 1)]]))
+
+(defn e-neighbours [[f1 f2]]
+  "Get neighbouring edges for an edge"
+  (let [[f3 f4] (e-opposite-tiles [f1 f2])]
+    [[f1 f3] [f1 f4] [f2 f3] [f2 f4]]))
