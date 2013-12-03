@@ -70,12 +70,20 @@
   (sort-by first (vec e)))
 
 (defn e-dir [e]
-  "get the 'direction' of a face"
+  "Get the 'direction' between two faces."
   (let [[[q1 r1] [q2 r2]] (order-e e)]
     (cond
      (= r1 r2) :x
      (= q1 q2) :y
      (= (+ q1 r1) (+ q2 r2)) :z)))
+
+(defn e-neighbours? [[f1 f2]]
+  "Are two faces neighbours?"
+  (let [[q1 r1] f1
+        [q2 r2] f2
+        s (Math/abs (+ (- q1 q2)
+                       (- r1 r2)))]
+    (<= s 1)))
 
 (defn e-opposite-tiles [e]
   "get the 'opposite' tiles to find neighbouring edges"
@@ -89,3 +97,18 @@
   "Get neighbouring edges for an edge"
   (let [[f3 f4] (e-opposite-tiles [f1 f2])]
     [[f1 f3] [f1 f4] [f2 f3] [f2 f4]]))
+
+(defn faces-expand [fs]
+  "Expand given faces by one neighbouring set (for the sea edges"
+  (set (reduce #(into %1 (face-neighbours %2)) fs fs)))
+
+(defn e-valid [fs e]
+  "Is this edge valid, given faces 'fs'? ie., are both faces either in m or direct neighbours of fs?"
+  ; OPTIMIZE!
+  (and (e-neighbours? e)
+       (not= (first e) (second e))
+       (every? (faces-expand fs) e)))
+
+(defn e-graph [fs]
+  "Build a graph of connected edges for passed-in faces"
+  )

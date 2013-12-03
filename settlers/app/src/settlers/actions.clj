@@ -3,7 +3,8 @@
               [settlers.utils :refer [has-at-least? dec-resources
                                       g-p]]
               [settlers.map :refer [vertex-to-faces
-                                    e-neighbours]]
+                                    e-neighbours
+                                    e-valid]]
               [settlers.create :refer [add-settlement
                                        add-road]]))
 
@@ -104,6 +105,12 @@
         player-roads (filter #(= (:id p) (:owner %)) (vals (:edges g)))]
     (println neighbours)
     (println player-roads)))
+
+
+(defn valid-edge [g e]
+  "Is this a valid edge?"
+  (let [faces (map :position (filter identity (apply concat (:map g))))]
+    (map)))
 
 (let [cost {:wood 1 :brick 1}]
   (defaction :build-road
