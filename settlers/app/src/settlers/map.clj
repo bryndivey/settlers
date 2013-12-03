@@ -79,10 +79,11 @@
 
 (defn e-opposite-tiles [e]
   "get the 'opposite' tiles to find neighbouring edges"
-  (case (e-dir [[q1 r1] [q2 r2]])
-    :x [[q1 (+ r1 1)] [q2 (- r2 1)]]
-    :y [[(- q1 1) (+ r1 1)] [(+ q2 1) (- r2 1)]]
-    :z [[q1 (- r1 1)] [q2 (+ r2 1)]]))
+  (let [[[q1 r1] [q2 r2]] (order-e e)]
+    (case (e-dir e)
+      :x [[q1 (+ r1 1)] [q2 (- r2 1)]]
+      :y [[(- q1 1) (+ r1 1)] [(+ q2 1) (- r2 1)]]
+      :z [[q1 (- r1 1)] [q2 (+ r2 1)]])))
 
 (defn e-neighbours [[f1 f2]]
   "Get neighbouring edges for an edge"

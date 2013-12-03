@@ -11,13 +11,16 @@
   (let [g (-> game
               (create/add-player "Bryn"))]
     (is (= (tiles-for-vertex g [[0 0] :n])
-           '({:terrain :forest, :roll 11} {:terrain :forest, :roll 10} {:terrain :hill, :roll 9})))
+           '({:terrain :forest, :roll 11 :position [0 0]}
+             {:terrain :forest, :roll 10 :position [0 -1]}
+             {:terrain :hill, :roll 9 :position [1 -1]})))
 
     (is (= (tiles-for-vertex g [[-2 3] :w])
-           '({:terrain :field, :roll 12})))
+           '({:terrain :field, :roll 12 :position [-2 2]})))
 
     (is (= (tiles-for-vertex g [[2 -2] :w])
-           '({:terrain :mountain, :roll 6} {:terrain :pasture, :roll 2})))
+           '({:terrain :mountain, :roll 6 :position [2 -2]}
+             {:terrain :pasture, :roll 2 :position [1 -2]})))
     ))
 
 

@@ -1,5 +1,6 @@
 (ns ^:shared settlers.actions
-    (:require [settlers.utils :refer [has-at-least? dec-resources
+    (:require [clojure.set :refer [intersection]]
+              [settlers.utils :refer [has-at-least? dec-resources
                                       g-p]]
               [settlers.map :refer [vertex-to-faces
                                     e-neighbours]]
@@ -67,8 +68,8 @@
         used-faces (map vertex-to-faces settlement-vertices)
         v-faces (vertex-to-faces v)
         t (fn [fs]
-            (> (count (clojure.set/intersection (set fs) (set v-faces)))
-               2))]
+            (> (count (intersection (set fs) (set v-faces)))
+               1))]
     (not-any? t used-faces)))
 
 (defn v-building-number [type num]
