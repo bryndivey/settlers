@@ -67,7 +67,7 @@
 
 (defn order-e [e]
   "Order set e into vector on q ordering"
-  (sort-by first (vec e)))
+  (sort-by first (sort-by second (vec e))))
 
 (defn e-dir [e]
   "Get the 'direction' between two faces."
@@ -95,8 +95,9 @@
 
 (defn e-neighbours [e]
   "Get neighbouring edges for an edge"
-  (let [f1 (first e)
-        f2 (second e)
+  (let [ordered (order-e e)
+        f1 (first ordered)
+        f2 (second ordered)
         [f3 f4] (e-opposite-tiles [f1 f2])]
     #{#{f1 f3}
       #{f1 f4}
@@ -132,5 +133,61 @@
 (defn e-face-graph [fs]
   "Build a graph of connected edges for passed-in faces"
   (e-graph (faces-edges fs)))
+
+
+(defn e-to-v [e]
+  "Convert an edge to a pair of vertices"
+  (map #(conj e %) (e-opposite-tiles e))
+  )
+
+
+(defn next-edges [e gr]
+  (gr e))
+
+(def es #{#{[-1 0] [0 0]}
+          #{[0 0] [0 -1]}
+          #{[-1 0] [0 -1]}
+          #{[0 -1] [1 -1]}
+          #{[-1 -1] [0 -1]}
+          #{[-1 0] [-1 -1]}
+          #{[-2 0] [-1 0]}
+          #{[-2 1] [-1 1]}
+          #{[-1 0] [-1 1]}})
+
+(def ess #{#{[-1 0] [0 0]}
+           #{[-1 0] [0 -1]}
+           #{[-1 0] [-1 -1]}
+           #{[0 0] [0 -1]}
+           #{[-2 0] [-1 0]}
+           #{[-2 0] [-2 1]}
+           #{[-2 1] [-1 0]}})
+
+
+
+(defn- second-last-neighbours [p g]
+  "Neighbours of the second-last element of path p"
+  (if (> (count p) 1)
+    (e-neighbours (nth p (- (count p) 2)))
+    #{}))
+
+(defn a' [ps g]
+  "Taking paths ps and graph g, return new paths with ps extended with neighbours of the last path element, if that element isn't in the ps already"
+  (for [p ps
+        n (filter (e-neighbours (last p)) (g (last p)))
+        :when (and (not ((set p) n))
+                   (not ((second-last-neighbours p g) n)))]
+    (conj p n)))
+
+
+(defn longest-path
+  "Find the longest path in graph gr"
+  ([gr] (longest-path (set (map vector (keys gr))) gr))
+  ([ps gr]
+     (let [new (a' ps gr)
+           ps' (into ps (a' ps gr))]
+       (if (= ps ps')
+         (apply max (map count ps'))
+         (recur ps' gr)))))
+
 
 
