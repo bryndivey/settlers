@@ -93,10 +93,15 @@
       :y [[(- q1 1) (+ r1 1)] [(+ q2 1) (- r2 1)]]
       :z [[q1 (- r1 1)] [q2 (+ r2 1)]])))
 
-(defn e-neighbours [[f1 f2]]
+(defn e-neighbours [e]
   "Get neighbouring edges for an edge"
-  (let [[f3 f4] (e-opposite-tiles [f1 f2])]
-    [[f1 f3] [f1 f4] [f2 f3] [f2 f4]]))
+  (let [f1 (first e)
+        f2 (second e)
+        [f3 f4] (e-opposite-tiles [f1 f2])]
+    #{#{f1 f3}
+      #{f1 f4}
+      #{f2 f3}
+      #{f2 f4}}))
 
 (defn faces-expand [fs]
   "Expand given faces by one neighbouring set (for the sea edges"
@@ -109,6 +114,23 @@
        (not= (first e) (second e))
        (every? (faces-expand fs) e)))
 
-(defn e-graph [fs]
+(defn face-edges [f]
+  "All the edges for this face"
+  (for [f' (face-neighbours f)]
+    #{f f'}))
+
+(defn faces-edges [fs]
+  "All the edges between faces fs"
+  (into #{} (apply concat (map face-edges fs))))
+
+(defn e-graph [es]
+  "Build a graph of connected edges for passed-in set of edges"
+  (let [f (fn [g e]
+            (assoc g e (filter es (e-neighbours e))))]
+    (reduce f {} es)))
+
+(defn e-face-graph [fs]
   "Build a graph of connected edges for passed-in faces"
-  )
+  (e-graph (faces-edges fs)))
+
+
