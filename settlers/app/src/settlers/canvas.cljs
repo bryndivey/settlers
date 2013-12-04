@@ -23,11 +23,11 @@
   (. ctx (lineTo x y))
   ctx)
 
-(defn stroke-style [ctx color]
+(defn set-stroke-style [ctx color]
   (set! (.-strokeStyle ctx) color)
   ctx)
 
-(defn stroke-width [ctx px]
+(defn set-stroke-width [ctx px]
   (set! (.-strokeWidth ctx) px)
   ctx)
 
@@ -35,13 +35,30 @@
   (. ctx (stroke))
   ctx)
 
-(defn fill-style [ctx color]
+(defn set-fill-style [ctx color]
   (set! (.-fillStyle ctx) color)
   ctx)
 
 (defn fill [ctx]
   (. ctx (fill))
   ctx)
+
+(defn set-font [ctx font]
+  (set! (.-font ctx) font)
+  ctx)
+
+(defn text [ctx x y text]
+  (. ctx (fillText text x y))
+  ctx)
+
+(defn centered-text [ctx x y t]
+  "x and y define the midpoint of the text, not the top-left"
+  (let [w (.-width (. ctx (measureText t)))
+        baseline (.-textBaseline ctx)]
+    (set! (.-textBaseline ctx) "middle")
+    (text ctx (- x (/ w 2)) y t)
+    (set! (.-textBaseline ctx) baseline)))
+
 
 
 

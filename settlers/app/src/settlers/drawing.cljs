@@ -9,39 +9,42 @@
 
 (def g (create/-create-game terrains))
 
-(def hex-size 41)
+(def hex-size 60)
+
+(def terrain-colors
+  {:desert "#DD8"
+   :mountain "#777"
+   :hill "#FB3"
+   :field "#ff0"
+   :forest "#181"
+   :pasture "#FFF"}
+  )
 
 (defn draw-tile [ctx {:keys [terrain roll position] :as tile}]
   (let [[q r] position
         s hex-size
-        {:keys [dx dy w h]} (c/hex-geo s)]
-
-    (c/fill-style ctx "#03c070")
+        {:keys [dx dy w h]} (c/hex-geo s)
+        x (+ (* (+ 2 r (/ q 2)) w))
+        y (* (+ 2 q) (+ s dy))]
 
     ;; apparently I did magic in here I don't fully understand
-    (c/hex ctx
-           (+ (* (+ 2 r (/ q 2)) w))
-           (* (+ 2 q) (+ s dy))
-           s)))
+    (c/set-fill-style ctx (terrain-colors terrain))
+    (c/hex ctx x y s)
+    
+    (c/set-font ctx "25pt Helvetica bold")
+    (c/set-fill-style ctx "#222")
+    (c/centered-text ctx (+ x (/ w 2)) (+ y (/ h 2)) (str roll))))
 
 (defn draw-game [ctx g]
+
+  (c/set-fill-style ctx "#66e")
+  (c/fill-rect ctx 0 0 1000 600)
   (doseq [row (:map g)
           tile row
           :when tile]
     (draw-tile ctx tile)))
 
-(defn draw-board [ctx x y]
-  (let [{:keys [dx dy w h]} (c/hex-geo hex-size)]
-    (doseq [i (range 3)]
-      (c/hex ctx (+ x (* i w) (* dx 2)) 0 hex-size))
-    (doseq [i (range 4)]
-      (c/hex ctx (+ x (* i w) dx) (+ y hex-size dy) hex-size))
-    (doseq [i (range 5)]
-      (c/hex ctx (+ x (* i w)) (+ y (* 2 (+ hex-size dy))) hex-size))
-    (doseq [i (range 4)]
-      (c/hex ctx (+ x (* i w) dx) (+ y (* 3 (+ hex-size dy))) hex-size))
-    (doseq [i (range 3)]
-      (c/hex ctx (+ x (* i w) (* dx 2)) (+ y (* 4 (+ hex-size dy))) hex-size))))
+
 
 (defn initialize [node]
   (let [ctx (c/get-context (dom/by-id "canvas") :2d)]
