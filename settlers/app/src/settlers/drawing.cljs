@@ -81,23 +81,26 @@
 (defn draw-road [ctx obj]
   (let [[f1 f2] (:position obj)
         dir (map/e-dir (:position obj))
-        road (c/rect ctx 0 0 10 hex-size)
+        road (c/rect ctx 0 0 8 hex-size)
+        road (c/transform! road "R180")
         ordered (map/order-e [f1 f2])
         {:keys [x y]} (c/hex-position (first ordered) hex-size)
         points (c/hex-points x y hex-size)
         angle (case dir
-                :y 60
-                :x 60
-                :z 0)
+                :x -120
+                :y 180
+                :z 120)
         pos (case dir
                :x (:s points)
-               :y (:s points)
-               :z (:se points))]
-    (.log js/console "P" (str pos))
-    
-    (c/transform! road (format "t%d,%dr%d" (first pos) (second pos) angle))
-    
-    (.log js/console (str x y))
+               :y (:se points)
+               :z (:s points))
+        off (case dir
+              :x "2,4"
+              :y "4,0"
+              :z "2,-3")]
+    (c/transform! road (format "R%d,0,0T%d,%dT%s" angle (first pos) (second pos) off))
+    (color-for-player road (:player obj))
+
 ))
 
 
@@ -115,7 +118,13 @@
     (doseq [[_ obj] (:vertices g)]
       (draw-vertex-object ctx obj))
 
-    (draw-road ctx {:player :bryn :position [[0 0] [0 1]]})))
+    (draw-road ctx {:player :bryn :position [[0 0] [0 1]]})
+    (draw-road ctx {:player :bryn :position [[0 0] [-1 1]]})
+    (draw-road ctx {:player :bryn :position [[0 0] [-1 0]]})
+    (draw-road ctx {:player :bryn :position [[0 0] [0 -1]]})
+    (draw-road ctx {:player :bryn :position [[0 0] [1 -1]]})
+    (draw-road ctx {:player :bryn :position [[0 0] [1 0]]})
+    ))
 
 
 
