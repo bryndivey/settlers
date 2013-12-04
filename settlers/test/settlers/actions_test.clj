@@ -23,4 +23,12 @@
 (deftest t-v-road-location
   (is (= true (v-road-location g {:id :bryn} {:target #{[-1 1] [0 0]}}))))
 
+(deftest t-build-road
+  (= (-> (perform-move g {:player :bryn
+                          :action :build-road
+                          :target #{[-1 1] [0 0]}})
+         :edges
+         (get #{[-1 1] [0 0]}))
+     {:type :road, :position #{[0 0] [-1 1]}, :player :bryn}))
+
 

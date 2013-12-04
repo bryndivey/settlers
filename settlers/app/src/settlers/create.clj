@@ -1,7 +1,7 @@
 (ns ^:shared settlers.create
     (:require [settlers.map :refer [set-qr]]))
 
-(defn create-player [name color]
+(defn create-player [name]
   (let [id (keyword (clojure.string/lower-case name))]
     {:id id
      :name name

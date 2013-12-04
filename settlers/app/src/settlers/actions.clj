@@ -104,7 +104,6 @@
   (map :position (filter identity (apply concat (:map g)))))
 
 (defn v-valid-edge [g _ a]
-  (println "TTTT" a)
   (e-valid (positions g) (:target a)))
 
 (defn v-road-location [g p a]
@@ -114,13 +113,10 @@
         neighbours (e-neighbours t)
         other-roads (map :position (filter #(not= (:id p) (:player %)) (vals (:edges g))))
         player-roads (map :position (filter #(= (:id p) (:player %)) (vals (:edges g))))]
-    (println t)
-    (println (t other-roads))
-    (println (t neighbours))
-    (println neighbours)
-    (and 
-         (not (t other-roads))
-         (t neighbours))))
+    (boolean
+     (and 
+      (not (t other-roads))
+      (some neighbours player-roads)))))
 
 
 (defn valid-edge [g e]
@@ -147,7 +143,7 @@
 
 (let [cost {:ore 3 :grain 2}]
   (defaction :build-city
-    :validate-fns [v-city-location-location
+    :validate-fns [v-city-location
                    (v-required-resources cost )
                    (v-building-number :city 4)]
     :perform-fn (fn [g p a]
