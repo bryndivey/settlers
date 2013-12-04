@@ -15,7 +15,16 @@
            (create/add-settlement :bryn [[-2 2] :n])
            (create/add-settlement :mark [[1 1] :n])
            (create/add-settlement :mark [[-1 0] :w])
-           (create/add-city :bryn [[1 -1] :w])))
+           (create/add-city :bryn [[1 -1] :w])
+
+           (create/add-road :bryn [[0 0] [0 1]])
+           (create/add-road :bryn [[0 0] [-1 1]])
+           (create/add-road :bryn [[0 0] [-1 0]])
+           (create/add-road :bryn [[0 0] [0 -1]])
+           (create/add-road :bryn [[0 -1] [1 -1]])           
+           ))
+
+
 
 (def hex-size 60)
 
@@ -86,24 +95,18 @@
         ordered (map/order-e [f1 f2])
         {:keys [x y]} (c/hex-position (first ordered) hex-size)
         points (c/hex-points x y hex-size)
-        angle (case dir
-                :x -120
-                :y 180
-                :z 120)
-        pos (case dir
-               :x (:s points)
-               :y (:se points)
-               :z (:s points))
-        off (case dir
-              :x "2,4"
-              :y "4,0"
-              :z "2,-3")]
+        [angle pos off] (case dir
+                          :x [-120 (:s points) "2,4"]
+                          :y [180 (:se points) "4,0"]
+                          :z [120 (:s points) "2,-3"])]
     (c/transform! road (format "R%d,0,0T%d,%dT%s" angle (first pos) (second pos) off))
     (color-for-player road (:player obj))
 
 ))
 
-
+(defn draw-edge-object [ctx obj]
+  (case (:type obj)
+    :road (draw-road ctx obj)))
 
 (defn draw-game [n g]
   (let [ctx (c/get-context "canvas" 1000 600)
@@ -114,17 +117,13 @@
             :when tile]
       (draw-tile ctx tile))
 
-    ; vertices
-    (doseq [[_ obj] (:vertices g)]
-      (draw-vertex-object ctx obj))
+    ; edges
+    (doseq [[_ obj] (:edges g)]
+      (draw-edge-object ctx obj))
 
-    (draw-road ctx {:player :bryn :position [[0 0] [0 1]]})
-    (draw-road ctx {:player :bryn :position [[0 0] [-1 1]]})
-    (draw-road ctx {:player :bryn :position [[0 0] [-1 0]]})
-    (draw-road ctx {:player :bryn :position [[0 0] [0 -1]]})
-    (draw-road ctx {:player :bryn :position [[0 0] [1 -1]]})
-    (draw-road ctx {:player :bryn :position [[0 0] [1 0]]})
-    ))
+    ;vertices
+    (doseq [[_ obj] (:vertices g)]
+      (draw-vertex-object ctx obj))))
 
 
 
