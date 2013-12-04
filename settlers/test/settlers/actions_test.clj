@@ -7,7 +7,9 @@
 
 (def terrains [:pasture :pasture :mountain :desert :pasture :hill :field :mountain :field :field :forest :field :forest :hill :mountain :forest :pasture :hill :forest])
 
-(def g (-> (create/-create-game terrains)
+(def cards [{:type :road-building} {:type :knight} {:type :victory-point} {:type :knight} {:type :knight} {:type :knight} {:type :knight} {:type :monopoly} {:type :victory-point} {:type :knight} {:type :year-of-plenty} {:type :victory-point} {:type :knight} {:type :victory-point} {:type :monopoly} {:type :knight} {:type :knight} {:type :road-building} {:type :knight} {:type :knight} {:type :knight} {:type :knight} {:type :victory-point} {:type :year-of-plenty} {:type :knight}])
+
+(def g (-> (create/-create-game terrains cards)
            (create/add-player "Bryn")
            (create/add-settlement :bryn [[0 0] :n])
            (create/add-settlement :bryn [[-2 2] :n])

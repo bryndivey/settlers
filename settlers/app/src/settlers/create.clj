@@ -24,6 +24,15 @@
                 [4 :forest]
                 [4 :pasture]])))
 
+(def cards
+  (reduce into []
+          (map (partial apply repeat)
+               [[14 {:type :knight}]
+                [2 {:type :road-building}]
+                [2 {:type :year-of-plenty}]
+                [2 {:type :monopoly}]
+                [5 {:type :victory-point}]])))
+
 ;; TODO - generate spiral
 (def positions [[0 -2]
                 [1 -2]
@@ -64,16 +73,17 @@
     (lfn map positions terrains rolls)))
 
 
-(defn -create-game [terrains]
+(defn -create-game [terrains cards]
   {:map (-create-map terrains)
    :vertices {}
    :edges {}
    :moves []
    :players {}
-   :player-order []})
+   :player-order []
+   :cards cards})
 
 (defn create-game []
-  (-create-game (shuffle terrains)))
+  (-create-game (shuffle terrains) (shuffle cards)))
 
 (defn add-player
   ([g name]

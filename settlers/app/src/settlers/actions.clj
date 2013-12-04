@@ -139,6 +139,8 @@
 
 (defn v-city-location [g p a]
   (if-let [cur ((:target a) (:vertices g))]
+    (and (= (:player cur) (:id p))
+         (= (:type cur) :settlement))
     true))
 
 (let [cost {:ore 3 :grain 2}]
@@ -149,4 +151,26 @@
     :perform-fn (fn [g p a]
                   (-> g
                       (add-city (:id p) (:target a))
+                      (dec-resources (:id p) cost)))))
+
+
+;; resource cards
+
+(defn v-available-cards [g _ _]
+  ; TODO
+  true)
+
+(defn deal-card [g pid]
+  (let [[card & rest] (:cards g)]
+    (-> g
+        (update-in g [:player :hand] conj card)
+        (assoc-in g [:cards] rest))))
+
+(let [cost {:wool 1 :ore 1 :grain 1}]
+  (defaction :buy-resource-card
+    :validate-fns [(v-required-resources cost)
+                   v-available-cards]
+    :perform-fn (fn [g p a]
+                  (-> g
+                      (deal-card (:id p))
                       (dec-resources (:id p) cost)))))
