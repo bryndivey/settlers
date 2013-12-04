@@ -80,7 +80,8 @@
    :moves []
    :players {}
    :player-order []
-   :cards cards})
+   :cards cards
+   :next-move nil})
 
 (defn create-game []
   (-create-game (shuffle terrains) (shuffle cards)))
@@ -90,7 +91,8 @@
       (let [p (create-player name)]
         (-> g 
             (assoc-in [:players (:id p)] p)
-            (update-in [:player-order] conj (:id p))))))
+            (update-in [:player-order] conj (:id p))
+            (assoc :next-move {:player (:id p) :type :game-move})))))
 
 (defn add-settlement [game player vertex]
   (assoc-in game [:vertices vertex] {:type :settlement
@@ -99,7 +101,7 @@
 
 (defn add-road [game player edge]
   (assoc-in game [:edges edge] {:type :road
-                                :position edge
+                                :position (set edge)
                                 :player player}))
 
 (defn add-city [game player vertex]

@@ -36,3 +36,15 @@
      (munge-resources + game player r-map)))
 
 (defn g-p [game move] ((:players game) (:player move)))
+
+(defn rotate-while 
+  "https://groups.google.com/forum/#!topic/clojure/SjmevTjZPcQ
+   Rotates a collection left while (pred item) is true. Will return a unrotated 
+   sequence if (pred item) is never true. Executes in O(n) time." 
+  [pred coll] 
+  (let [head (drop-while pred coll)] 
+    (take (count coll) (concat head coll)))) 
+
+(defn rotate [n s] 
+  (let [[front back] (split-at (mod n (count s)) s)] 
+    (concat back front))) 

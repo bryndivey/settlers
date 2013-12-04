@@ -8,7 +8,7 @@
 
 (def terrains [:pasture :pasture :mountain :desert :pasture :hill :field :mountain :field :field :forest :field :forest :hill :mountain :forest :pasture :hill :forest])
 
-(def g (-> (create/create-game)
+(comment def g (-> (create/create-game)
            (create/add-player "Bryn")
            (create/add-player "Mark")
            (create/add-settlement :bryn [[0 0] :n])
@@ -24,7 +24,19 @@
            (create/add-road :bryn [[0 -1] [1 -1]])           
            ))
 
-
+(def g (-> (create/create-game)
+           (create/add-player "Bryn")
+           (create/add-player "Mark")
+           
+           (create/add-settlement :bryn [[0 0] :n])
+           (create/add-road :bryn [[0 0] [-1 0]])
+           (create/add-settlement :bryn [[2 -2] :n])
+           (create/add-road :bryn [[1 -2] [1 -1]])
+           
+           (create/add-settlement :mark [[1 1] :n])
+           (create/add-road :mark [[1 1] [0 1]])
+           (create/add-settlement :mark [[-1 0] :w])
+           (create/add-road :mark [[-1 0] [-2 0]])))
 
 (def hex-size 60)
 

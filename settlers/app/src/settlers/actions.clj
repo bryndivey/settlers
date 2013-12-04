@@ -25,9 +25,7 @@
 
 (defn validators-pass? [vfns game player args]
   (let [do-validate (fn [vfn]
-                      (try
-                        (vfn game player args)
-                        (catch Exception e false)))]
+                      (vfn game player args))]
     (or (not vfns)
         (every? true? (map do-validate vfns)))))
 
@@ -35,7 +33,7 @@
 (defn valid-move? [game move]
   ; should fail-out on first error but i don't know the codez for that
   (assert (every? #{:player :action} (keys (select-keys move [:player :action]))) "Must have :player and :action on every move!")
-  
+
   (let [player (g-p game move)
         vfns (get-action-fn (:action move) :validate)]
     (validators-pass? vfns game player (dissoc move :player :action))))
@@ -110,14 +108,16 @@
 (defn v-road-location [g p a]
   "Get the neighbours for the edge and ensure one is a road belonging to the player"
   (let [t (:target a)
-        valid-edge (v-valid-edge g p a)
         neighbours (e-neighbours t)
         other-roads (map :position (filter #(not= (:id p) (:player %)) (vals (:edges g))))
-        player-roads (map :position (filter #(= (:id p) (:player %)) (vals (:edges g))))]
-    (boolean
-     (and 
-      (not (t other-roads))
-      (some neighbours player-roads)))))
+        player-roads (map :position (filter #(= (:id p) (:player %)) (vals (:edges g))))
+        res (boolean
+             (and 
+              (not ((set other-roads) t))
+              (some neighbours player-roads)))]
+    res
+
+))
 
 
 (defn valid-edge [g e]
@@ -127,7 +127,8 @@
 
 (let [cost {:wood 1 :brick 1}]
   (defaction :build-road
-    :validate-fns [v-road-location
+    :validate-fns [v-valid-edge
+                   v-road-location
                    (v-required-resources cost)
                    (v-building-number :road 15)]
     :perform-fn (fn [g p a]
