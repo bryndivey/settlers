@@ -77,13 +77,14 @@
      (= q1 q2) :y
      (= (+ q1 r1) (+ q2 r2)) :z)))
 
-(defn e-neighbours? [[f1 f2]]
-  "Are two faces neighbours?"
-  (let [[q1 r1] f1
-        [q2 r2] f2
-        s (Math/abs (+ (- q1 q2)
-                       (- r1 r2)))]
-    (<= s 1)))
+
+(defn e-neighbours? [e]
+    "Are two faces neighbours?"
+    (let [[q1 r1] (first e)
+          [q2 r2] (second e)
+          s (Math/abs (+ (- q1 q2)
+                         (- r1 r2)))]
+      (<= s 1)))
 
 (defn e-opposite-tiles [e]
   "get the 'opposite' tiles to find neighbouring edges"

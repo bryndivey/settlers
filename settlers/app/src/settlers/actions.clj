@@ -99,12 +99,27 @@
 
 ;; road building
 
+(defn- positions [g]
+  (map :position (filter identity (apply concat (:map g)))))
+
+(defn v-valid-edge [g _ a]
+  (println "TTTT" a)
+  (e-valid (positions g) (:target a)))
+
 (defn v-road-location [g p a]
   "Get the neighbours for the edge and ensure one is a road belonging to the player"
-  (let [neighbours (e-neighbours (:target a))
-        player-roads (filter #(= (:id p) (:owner %)) (vals (:edges g)))]
+  (let [t (:target a)
+        valid-edge (v-valid-edge g p a)
+        neighbours (e-neighbours t)
+        other-roads (map :position (filter #(not= (:id p) (:owner %)) (vals (:edges g))))
+        player-roads (map :position (filter #(= (:id p) (:owner %)) (vals (:edges g))))]
+    (println t)
+    (println (t other-roads))
+    (println (t neighbours))
     (println neighbours)
-    (println player-roads)))
+    (and 
+         (not (t other-roads))
+         (t neighbours))))
 
 
 (defn valid-edge [g e]
