@@ -5,7 +5,7 @@
 
 
 (defn text [ctx x y text]
-  (. ctx text x y text))
+  (.text ctx x y text))
 
 (defn centered-text [ctx x y t]
   "x and y define the midpoint of the text, not the top-left"
@@ -29,13 +29,23 @@
   (let [{:keys [dx dy w h]} (hex-geo s)
         move-to (fn [x y] (format "M%d %d" x y))
         line-to (fn [x y] (format "L%d %d" x y))]
-    (. ctx path (str (move-to (+ x dx) y)
-                     (line-to (+ x w) (+ y dy))
-                     (line-to (+ x w) (+ y dy s))
-                     (line-to (+ x dx) (+ y h))
-                     (line-to x (+ y dy s))
-                     (line-to x (+ y dy))
-                     (line-to (+ x dx) y)))))
+    (.path ctx (str (move-to (+ x dx) y)
+                    (line-to (+ x w) (+ y dy))
+                    (line-to (+ x w) (+ y dy s))
+                    (line-to (+ x dx) (+ y h))
+                    (line-to x (+ y dy s))
+                    (line-to x (+ y dy))
+                    (line-to (+ x dx) y)))))
 
 (defn rect [ctx x y w h]
   (. ctx rect x y w h))
+
+(defn set [ctx & rest]
+  (let [s (.set ctx)]
+    (doseq [o rest]
+      (.push s o))
+    s))
+
+(defn set-onclick! [o f]
+  (.click o f)
+  o)
