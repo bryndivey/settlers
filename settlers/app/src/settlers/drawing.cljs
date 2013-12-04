@@ -21,33 +21,32 @@
   )
 
 (defn draw-tile [ctx {:keys [terrain roll position] :as tile}]
+  "Creates a new canvas element for this tile."
   (let [[q r] position
         s hex-size
         {:keys [dx dy w h]} (c/hex-geo s)
         x (+ (* (+ 2 r (/ q 2)) w))
-        y (* (+ 2 q) (+ s dy))]
+        y (* (+ 2 q) (+ s dy))
 
-    ;; apparently I did magic in here I don't fully understand
-    (c/set-fill-style ctx (terrain-colors terrain))
-    (c/hex ctx x y s)
-    
-    (c/set-font ctx "25pt Helvetica bold")
-    (c/set-fill-style ctx "#222")
-    (c/centered-text ctx (+ x (/ w 2)) (+ y (/ h 2)) (str roll))))
+        hex (c/hex ctx x y s)
+        text (.attr (c/centered-text ctx (+ x (/ w 2)) (+ y (/ h 2)) (str roll)) "font-size" 25)
+        ]
 
-(defn draw-game [ctx g]
+    (c/set-fill! hex (terrain-colors terrain))))
 
-  (c/set-fill-style ctx "#66e")
-  (c/fill-rect ctx 0 0 1000 600)
-  (doseq [row (:map g)
-          tile row
-          :when tile]
-    (draw-tile ctx tile)))
+
+(defn draw-game [n g]
+  (let [ctx (c/get-context "canvas" 1000 600)
+        background (c/set-fill! (c/rect ctx 0 0 1000 600) "#77f")]
+    (doseq [row (:map g)
+            tile row
+            :when tile]
+      (draw-tile ctx tile))))
 
 
 
 (defn initialize [node]
-  (let [ctx (c/get-context (dom/by-id "canvas") :2d)]
-    (draw-game ctx g)))
+  (let [n (dom/by-id "canvas")]
+    (draw-game n g)))
 
 
