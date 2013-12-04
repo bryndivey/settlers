@@ -1,7 +1,7 @@
 (ns ^:shared settlers.create
     (:require [settlers.map :refer [set-qr]]))
 
-(defn create-player [name]
+(defn create-player [name color]
   (let [id (keyword (clojure.string/lower-case name))]
     {:id id
      :name name
@@ -75,24 +75,25 @@
 (defn create-game []
   (-create-game (shuffle terrains)))
 
-(defn add-player [g name]
-  (let [p (create-player name)]
-    (-> g 
-        (assoc-in [:players (:id p)] p)
-        (update-in [:player-order] conj (:id p)))))
+(defn add-player
+  ([g name]
+      (let [p (create-player name)]
+        (-> g 
+            (assoc-in [:players (:id p)] p)
+            (update-in [:player-order] conj (:id p))))))
 
 (defn add-settlement [game player vertex]
   (assoc-in game [:vertices vertex] {:type :settlement
                                      :position vertex
-                                     :owner player}))
+                                     :player player}))
 
 (defn add-road [game player edge]
   (assoc-in game [:edges edge] {:type :road
                                 :position edge
-                                :owner player}))
+                                :player player}))
 
 (defn add-city [game player vertex]
   (assoc-in game [:vertices vertex] {:type :city
                                      :position vertex
-                                     :owner player}))
+                                     :player player}))
 

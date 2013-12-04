@@ -47,7 +47,10 @@
     (.path ctx path)))
 
 (defn rect [ctx x y w h]
-  (. ctx rect x y w h))
+  (.rect ctx x y w h))
+
+(defn circle [ctx x y r]
+  (.circle ctx x y r))
 
 (defn set [ctx & rest]
   (let [s (.set ctx)]
@@ -57,4 +60,8 @@
 
 (defn set-onclick! [o f]
   (.click o f)
+  o)
+
+(defn transform! [o s]
+  (.transform o s)
   o)

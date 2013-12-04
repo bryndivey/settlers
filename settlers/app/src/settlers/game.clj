@@ -48,7 +48,7 @@
     (assert r (str "Invalid terrain" (:terrain t)))
     (assert n (str "Invalid settlement" s))
 
-    (update-in g [:players (:owner s) :resources r] + n)))
+    (update-in g [:players (:player s) :resources r] + n)))
 
 (defn allocate-for-tile [g t]
   "Takes a tile and a game and figures out who gets stuff"

@@ -112,8 +112,8 @@
   (let [t (:target a)
         valid-edge (v-valid-edge g p a)
         neighbours (e-neighbours t)
-        other-roads (map :position (filter #(not= (:id p) (:owner %)) (vals (:edges g))))
-        player-roads (map :position (filter #(= (:id p) (:owner %)) (vals (:edges g))))]
+        other-roads (map :position (filter #(not= (:id p) (:player %)) (vals (:edges g))))
+        player-roads (map :position (filter #(= (:id p) (:player %)) (vals (:edges g))))]
     (println t)
     (println (t other-roads))
     (println (t neighbours))
