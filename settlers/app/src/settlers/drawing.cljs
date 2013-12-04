@@ -20,16 +20,13 @@
    :pasture "#FFF"}
   )
 
-(defn hex-position [[q r]]
-  (let [{:keys dx dy w h} (c/hex-geo hex-size)]
-    {:x (+ (* (+ 2 r (/ q 2)) w))
-     :y (* (+ 2 q) (+ s dy))}))
+
 
 (defn draw-tile [ctx {:keys [terrain roll position] :as tile}]
   "Creates a new canvas element for this tile."
   (let [s hex-size
         {:keys [dx dy w h]} (c/hex-geo s)
-        {:keys [x y]} (hex-position position)
+        {:keys [x y]} (c/hex-position position hex-size)
 
         hex (c/set-fill! (c/hex ctx x y s) (terrain-colors terrain))
         text (.attr (c/centered-text ctx (+ x (/ w 2)) (+ y (/ h 2)) (str roll)) "font-size" 25)

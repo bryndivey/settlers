@@ -25,17 +25,26 @@
         dx (Math/floor (Math/abs (* (Math/cos r) s)))]
     {:dy dy :dx dx :w (* 2 dx) :h (+ (* 2 dy) s)}))
 
-(defn hex [ctx x y s]
-  (let [{:keys [dx dy w h]} (hex-geo s)
+(defn hex-position [[q r] s]
+  (let [{:keys [dx dy w h]} (hex-geo s)]
+    {:x (+ (* (+ 2 r (/ q 2)) w))
+     :y (* (+ 2 q) (+ s dy))}))
+
+(defn hex-points [x y s]
+  (let [{:keys [dx dy w h]} (hex-geo s)]
+    {:n [(+ x dx) y]
+     :ne [(+ x w) (+ y dy)]
+     :se [(+ x w) (+ y dy s)]
+     :s [(+ x dx) (+ y h)]
+     :sw [x (+ y dy s)]
+     :nw [x (+ y dy)]}))
+
+(defn hex [ctx x y size]
+  (let [{:keys [n ne se s sw nw]} (hex-points x y size)
         move-to (fn [x y] (format "M%d %d" x y))
-        line-to (fn [x y] (format "L%d %d" x y))]
-    (.path ctx (str (move-to (+ x dx) y)
-                    (line-to (+ x w) (+ y dy))
-                    (line-to (+ x w) (+ y dy s))
-                    (line-to (+ x dx) (+ y h))
-                    (line-to x (+ y dy s))
-                    (line-to x (+ y dy))
-                    (line-to (+ x dx) y)))))
+        line-to (fn [x y] (format "L%d %d" x y))
+        path (str (apply move-to n) (apply str (map #(apply line-to %) [ne se s sw nw n])))]
+    (.path ctx path)))
 
 (defn rect [ctx x y w h]
   (. ctx rect x y w h))
