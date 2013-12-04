@@ -11,8 +11,26 @@
 
 (def hex-size 41)
 
+(defn draw-tile [ctx {:keys [terrain roll position] :as tile}]
+  (let [[q r] position
+        s hex-size
+        {:keys [dx dy w h]} (c/hex-geo s)]
+
+    (c/fill-style ctx "#03c070")
+
+    ;; apparently I did magic in here I don't fully understand
+    (c/hex ctx
+           (+ (* (+ 2 r (/ q 2)) w))
+           (* (+ 2 q) (+ s dy))
+           s)))
+
+(defn draw-game [ctx g]
+  (doseq [row (:map g)
+          tile row
+          :when tile]
+    (draw-tile ctx tile)))
+
 (defn draw-board [ctx x y]
-  (c/fill-style ctx "#03c070")
   (let [{:keys [dx dy w h]} (c/hex-geo hex-size)]
     (doseq [i (range 3)]
       (c/hex ctx (+ x (* i w) (* dx 2)) 0 hex-size))
@@ -27,6 +45,6 @@
 
 (defn initialize [node]
   (let [ctx (c/get-context (dom/by-id "canvas") :2d)]
-    (draw-board ctx 0 0)))
+    (draw-game ctx g)))
 
 
