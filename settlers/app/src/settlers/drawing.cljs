@@ -2,6 +2,7 @@
   (:require [domina :as dom]
             [domina.css :as css]
             [io.pedestal.app.util.log :as log]
+            [settlers.map :as map]
             [settlers.canvas :as c]
             [settlers.create :as create]))
 
@@ -75,6 +76,32 @@
     :settlement (draw-settlement ctx obj)
     :city (draw-city ctx obj)))
 
+
+
+(defn draw-road [ctx obj]
+  (let [[f1 f2] (:position obj)
+        dir (map/e-dir (:position obj))
+        road (c/rect ctx 0 0 10 hex-size)
+        ordered (map/order-e [f1 f2])
+        {:keys [x y]} (c/hex-position (first ordered) hex-size)
+        points (c/hex-points x y hex-size)
+        angle (case dir
+                :y 60
+                :x 60
+                :z 0)
+        pos (case dir
+               :x (:s points)
+               :y (:s points)
+               :z (:se points))]
+    (.log js/console "P" (str pos))
+    
+    (c/transform! road (format "t%d,%dr%d" (first pos) (second pos) angle))
+    
+    (.log js/console (str x y))
+))
+
+
+
 (defn draw-game [n g]
   (let [ctx (c/get-context "canvas" 1000 600)
         background (c/set-fill! (c/rect ctx 0 0 1000 600) "#77f")]
@@ -86,7 +113,9 @@
 
     ; vertices
     (doseq [[_ obj] (:vertices g)]
-      (draw-vertex-object ctx obj))))
+      (draw-vertex-object ctx obj))
+
+    (draw-road ctx {:player :bryn :position [[0 0] [0 1]]})))
 
 
 
