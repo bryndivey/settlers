@@ -44,6 +44,7 @@
   (let [player (g-p game move)]
 
     (assert player "No such player!")
+    (assert (get-action-fn (:action move) :perform) "No such move!")
     (assert (valid-move? game move))
 
     (let [fn (get-action-fn (:action move) :perform)
@@ -163,11 +164,11 @@
 (defn deal-card [g pid]
   (let [[card & rest] (:cards g)]
     (-> g
-        (update-in g [:player :hand] conj card)
-        (assoc-in g [:cards] rest))))
+        (update-in [:players pid :hand] conj card)
+        (assoc-in [:cards] rest))))
 
 (let [cost {:wool 1 :ore 1 :grain 1}]
-  (defaction :buy-resource-card
+  (defaction :buy-development-card
     :validate-fns [(v-required-resources cost)
                    v-available-cards]
     :perform-fn (fn [g p a]
