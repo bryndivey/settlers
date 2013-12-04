@@ -2,7 +2,9 @@
   (:require [domina :as dom]
             [io.pedestal.app.render.push :as render]
             [io.pedestal.app.render.push.templates :as templates]
-            [io.pedestal.app.render.push.handlers.automatic :as d])
+            [io.pedestal.app.render.push.handlers.automatic :as d]
+            [io.pedestal.app.util.log :as log]
+            [settlers.drawing :as drawing])
   (:require-macros [settlers.html-templates :as html-templates]))
 
 ;; Load templates.
@@ -37,11 +39,13 @@
         ;; associate this template with the node at
         ;; path. `add-template` returns a function that can be called
         ;; to generate the initial HTML.
-        html (templates/add-template renderer path (:settlers-page templates))]
+        html (templates/add-template renderer path (:settlers-page templates))
+        node (html {:id id :message ""})]
     ;; Call the `html` function, passing the initial values for the
     ;; template. This returns an HTML string which is then added to
     ;; the DOM using Domina.
-    (dom/append! (dom/by-id parent) (html {:id id :message ""}))))
+    (dom/append! (dom/by-id parent) node)
+    (drawing/initialize node)))
 
 (defn render-message [renderer [_ path _ new-value] transmitter]
   ;; This function responds to a :value event. It uses the
