@@ -90,3 +90,9 @@
   (assoc-in game [:edges edge] {:type :road
                                 :position edge
                                 :owner player}))
+
+(defn add-city [game player vertex]
+  (assoc-in game [:vertices vertex] {:type :city
+                                     :position vertex
+                                     :owner player}))
+

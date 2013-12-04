@@ -6,7 +6,8 @@
                                     e-neighbours
                                     e-valid]]
               [settlers.create :refer [add-settlement
-                                       add-road]]))
+                                       add-road
+                                       add-city]]))
 
 (def action-fns (atom {}))
 
@@ -137,3 +138,19 @@
                       (add-road (:id p) (:target a))
                       (dec-resources (:id p) cost)))))
 
+
+;; city building
+
+(defn v-city-location [g p a]
+  (if-let [cur ((:target a) (:vertices g))]
+    true))
+
+(let [cost {:ore 3 :grain 2}]
+  (defaction :build-city
+    :validate-fns [v-city-location-location
+                   (v-required-resources cost )
+                   (v-building-number :city 4)]
+    :perform-fn (fn [g p a]
+                  (-> g
+                      (add-city (:id p) (:target a))
+                      (dec-resources (:id p) cost)))))
