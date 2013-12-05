@@ -42,19 +42,8 @@
    :emit [{:init init-game}
           [#{[:move]
              [:error]
-             [:tick]
+             [:game]
              
-             [:game :map]
-             [:game :edges]
-             [:game :vertices]
-             [:game :next-move]
-             [:game :moves]
-             [:game :last-roll]
-
-             [:game :players :* :name]
-             [:game :players :* :resources]
-             [:game :players :* :moves]
-             [:game :players :* :hand]
              } (app/default-emitter [:main])]
           ]   
    })

@@ -138,9 +138,11 @@
       (draw-vertex-object ctx obj))))
 
 
-
-(defn initialize [node]
+(defn initialize []
   (let [n (dom/by-id "canvas")]
     (draw-game n g)))
+
+(defn render [g]
+  (draw-game (dom/by-id "canvas") g))
 
 
