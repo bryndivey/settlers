@@ -77,7 +77,7 @@
         [x y] (case d
                 :n (:n points)
                 :w (:nw points))]
-    (c/transform! obj (format "t%d,%d" x y))))
+    (c/move-to! obj x y)))
 
 (defn color-for-player [obj player]
   (c/set-fill! obj (player-color player)))
@@ -103,7 +103,7 @@
   (let [[f1 f2] (:position obj)
         dir (map/e-dir (:position obj))
         road (c/rect ctx 0 0 8 hex-size)
-        road (c/transform! road "R180")
+        road (c/rotate! road 180)
         ordered (map/order-e [f1 f2])
         {:keys [x y]} (c/hex-position (first ordered) hex-size)
         points (c/hex-points x y hex-size)
@@ -120,22 +120,40 @@
   (case (:type obj)
     :road (draw-road ctx obj)))
 
+(defn draw-player [ctx p]
+  "Draw player info"
+  (let [name (c/text ctx 0 0 (:name p))
+        resources (c/text ctx 0 15 (apply str (doall (for [[k v] (:resources p)]
+                                                          (str k ":" v " ")))))]
+    (doall (map #(.attr % "font-size" 18) [name resources]))
+    (c/move-to-origin! name)
+    (c/move-to-origin! resources)
+    (c/set ctx name resources)))
+
 (defn draw-game [n g]
   (let [ctx (c/get-context "canvas" 1000 600)
         background (c/set-fill! (c/rect ctx 0 0 1000 600) "#77f")]
-    ; tiles
+                                        ; tiles
     (doseq [row (:map g)
             tile row
             :when tile]
       (draw-tile ctx tile))
 
-    ; edges
+                                        ; edges
     (doseq [[_ obj] (:edges g)]
       (draw-edge-object ctx obj))
 
-    ;vertices
+                                        ;vertices
     (doseq [[_ obj] (:vertices g)]
-      (draw-vertex-object ctx obj))))
+      (draw-vertex-object ctx obj))
+
+                                        ;players
+    (doseq [[i p] (map vector (range) (vals (:players g)))]
+      (let [p (draw-player ctx p)]
+        (.log js/console "P" p)
+        (c/move-to! p 700 (+ 20 (* i 40)))
+))
+    ))
 
 
 (defn initialize []

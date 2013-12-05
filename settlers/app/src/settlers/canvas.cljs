@@ -65,3 +65,19 @@
 (defn transform! [o s]
   (.transform o s)
   o)
+
+(defn move-to! [o x y]
+  (transform! o (format "T%d,%d" x y)))
+
+(defn move! [o x y]
+  (transform! o (format "t%d,%d" x y)))
+
+(defn rotate! [o d]
+  (transform! o (format "R%d" d)))
+
+(defn move-to-origin! [o]
+  "Moves a centered thing to origin"
+  (let [bbox (.getBBox o)]
+    ; TODO - y
+    (transform! o (format "t%d,%d" (/  (.-width bbox) 2) 0))
+    o))
