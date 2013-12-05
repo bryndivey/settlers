@@ -48,6 +48,9 @@
   (let [i (map (partial norm-pos m) [q r])]
     (assoc-in m i v)))
 
+(defn faces-expand [fs]
+  "Expand given faces by one neighbouring set (for the sea edges"
+  (set (reduce #(into %1 (face-neighbours %2)) fs fs)))
 
 ;; vertices
 ;; face + n/w 
@@ -61,6 +64,9 @@
   (cond (= d :n) [[q r] [q (- r 1)] [(+ q 1) (- r 1)]]
         (= d :w) [[q r] [(- q 1) r] [q (- r 1)]]
         :else (throw (Exception. (str "Invalid direction" d)))))
+
+(defn all-vertices [fs]
+  "All possible vertices for input faces")
 
 ;; edges
 ;; edges are two faces, which are a q and r each
@@ -104,10 +110,6 @@
       #{f1 f4}
       #{f2 f3}
       #{f2 f4}}))
-
-(defn faces-expand [fs]
-  "Expand given faces by one neighbouring set (for the sea edges"
-  (set (reduce #(into %1 (face-neighbours %2)) fs fs)))
 
 (defn e-valid [fs e]
   "Is this edge valid, given faces 'fs'? ie., are both faces either in m or direct neighbours of fs?"

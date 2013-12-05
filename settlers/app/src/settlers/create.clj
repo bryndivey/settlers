@@ -92,7 +92,7 @@
         (-> g 
             (assoc-in [:players (:id p)] p)
             (update-in [:player-order] conj (:id p))
-            (assoc :next-move {:player (:id p) :type :game-move})))))
+            (assoc :next-move {:player (:id p) :type :game-action})))))
 
 (defn add-settlement [game player vertex]
   (assoc-in game [:vertices vertex] {:type :settlement

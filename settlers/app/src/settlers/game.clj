@@ -63,22 +63,24 @@
 
 (defn do-resource-allocation [g r]
   "Takes a game and a roll and does resources"
-  (reduce allocate-for-tile g (tiles-for-roll g r)))
+  (update-in 
+      (reduce allocate-for-tile g (tiles-for-roll g r))
+      [:moves] conj {:type :roll :roll r}))
 
 (defn resource-roll [g]
   (let [r (r2d)]
-    (assoc (do-resource-allocation g r) :last-roll r)))
+    (do-resource-allocation g r)))
 
 
 
 
 (defn valid-action [t a]
   "Is this action valid in the current move type?"
-  (let [v-map {:game-move #{:build-road
-                            :build-settlement
-                            :build-city
-                            :buy-development-card
-                            :end-turn}}]
+  (let [v-map {:game-action #{:build-road
+                              :build-settlement
+                              :build-city
+                              :buy-development-card
+                              :end-turn}}]
     (boolean ((v-map t) a))))
 
 (defn next-player [g p]
@@ -95,10 +97,9 @@
                                      resource-roll
                                      (assoc :next-move {:player
                                                         (next-player g (:player (:next-move g)))
-                                                        :type :game-move}))
+                                                        :type :game-action}))
             :else  (perform-move g m))
-           (do (println "INVALID:")
-               (assoc g :error "Invalid move")))
+           (assoc g :error "Invalid move"))
          (assoc g :error "Invalid move")))))
 
 (defn create []

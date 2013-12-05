@@ -51,10 +51,10 @@
   (is (= (next-player g :mark) :bryn)))
 
 (deftest t-game-loop
-  (is (= (:next-move g) {:player :mark :type :game-move}))
+  (is (= (:next-move g) {:player :mark :type :game-action}))
   (let [g' (game-loop g {:player :mark :action :end-turn})]
     (is (= (:next-move g'
-            {:player :bryn :type :game-move}))))
+            {:player :bryn :type :game-action}))))
   (let [g' (-> g
                (inc-resources :mark {:wood 1 :brick 1})
                (game-loop {:player :mark :action :build-road :target #{[1 0] [1 1]}}))]
@@ -62,6 +62,6 @@
            {:type :road, :position #{[1 0] [1 1]}, :player :mark})))
   (let [g' (-> g
                (game-loop {:player :mark :action :build-road :target #{[1 0] [1 1]}}))]
-    (is (= (:next-move g) {:player :mark :type :game-action}))
-    (println (keys g))
-    (is (= (:error g) "Invalid move"))))
+    (is (= (:next-move g') {:player :mark :type :game-action}))
+    (println (keys g'))
+    (is (= (:error g') "Invalid move"))))
