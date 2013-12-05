@@ -1,6 +1,7 @@
 (ns ^:shared settlers.game
     (:require [settlers.map :as map]
               [settlers.actions :refer [perform-move valid-move?]]
+              [settlers.create :as create]
               [settlers.utils :as utils]))
 
 ;; map fetches
@@ -34,7 +35,7 @@
 
 (defn resource-for-terrain [g t]
   (t {:mountain :ore
-      :field :wheat
+      :field :grain
       :forest :wood
       :hill :brick
       :pasture :wool}))
@@ -66,7 +67,7 @@
 
 (defn resource-roll [g]
   (let [r (r2d)]
-    (do-resource-allocation g r)))
+    (assoc (do-resource-allocation g r) :last-roll r)))
 
 
 
@@ -99,6 +100,21 @@
            (do (println "INVALID:")
                (assoc g :error "Invalid move")))
          (assoc g :error "Invalid move")))))
+
+(defn create []
+  (-> (create/create-game)
+      (create/add-player "Bryn")
+      (create/add-player "Mark")
+      
+      (create/add-settlement :bryn [[0 0] :n])
+      (create/add-road :bryn #{[0 0] [-1 0]})
+      (create/add-settlement :bryn [[2 -2] :n])
+      (create/add-road :bryn #{[1 -2] [1 -1]})
+      
+      (create/add-settlement :mark [[1 1] :n])
+      (create/add-road :mark #{[1 1] [0 1]})
+      (create/add-settlement :mark [[-1 0] :w])
+      (create/add-road :mark #{[-1 0] [-2 0]})))
 
 
 

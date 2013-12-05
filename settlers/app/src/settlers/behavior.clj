@@ -1,76 +1,61 @@
 (ns ^:shared settlers.behavior
     (:require [clojure.string :as string]
+              [io.pedestal.app :as app]
               [io.pedestal.app.messages :as msg]))
-;; While creating new behavior, write tests to confirm that it is
-;; correct. For examples of various kinds of tests, see
-;; test/settlers/behavior-test.clj.
 
-(defn set-value-transform [old-value message]
+;; TRANSFORMS
+
+(defn swap-transform [_ message]
   (:value message))
 
+(defn move-transform [t message]
+  (assoc (select-keys message [:player :slot :targets]) :nub (rand)))
+
+(defn inc-transform [old _]
+  ((fnil inc 1) old))
+
+
+;; INITIALIZERS
+
+(defn init-game [_]
+  [[:transform-enable [:main :move]
+    :perform-move [{msg/topic [:move]
+                    (msg/param :player) {:read-as :data}
+                    (msg/param :action) {:read-as :data}
+                    (msg/param :target) {:read-as :data}}]]])
+
+(defn send-move [inputs]
+  (let [message (:message inputs)
+        game (get-in inputs [:new-model :game])]
+    [{msg/type :perform-move :msg/topic [:game] :game game :move (select-keys
+                                                                  message
+                                                                  [:action :player :target])}]))
+
+
 (def example-app
-  ;; There are currently 2 versions (formats) for dataflow
-  ;; description: the original version (version 1) and the current
-  ;; version (version 2). If the version is not specified, the
-  ;; description will be assumed to be version 1 and an attempt
-  ;; will be made to convert it to version 2.
   {:version 2
-   :transform [[:set-value [:greeting] set-value-transform]]})
+   :transform [[:swap [:**] swap-transform]
+               [:perform-move [:move] move-transform]]
 
-;; Once this behavior works, run the Data UI and record
-;; rendering data which can be used while working on a custom
-;; renderer. Rendering involves making a template:
-;;
-;; app/templates/settlers.html
-;;
-;; slicing the template into pieces you can use:
-;;
-;; app/src/settlers/html_templates.cljs
-;;
-;; and then writing the rendering code:
-;;
-;; app/src/settlers/rendering.cljs
+   :effect #{{:in #{[:move]} :fn send-move}}
 
-(comment
-  ;; The examples below show the signature of each type of function
-  ;; that is used to build a behavior dataflow.
+   :emit [{:init init-game}
+          [#{[:move]
+             [:error]
+             [:tick]
+             
+             [:game :map]
+             [:game :edges]
+             [:game :vertices]
+             [:game :next-move]
+             [:game :moves]
+             [:game :last-roll]
 
-  ;; transform
+             [:game :players :* :name]
+             [:game :players :* :resources]
+             [:game :players :* :moves]
+             [:game :players :* :hand]
+             } (app/default-emitter [:main])]
+          ]   
+   })
 
-  (defn example-transform [old-state message]
-    ;; returns new state
-    )
-
-  ;; derive
-
-  (defn example-derive [old-state inputs]
-    ;; returns new state
-    )
-
-  ;; emit
-
-  (defn example-emit [inputs]
-    ;; returns rendering deltas
-    )
-
-  ;; effect
-
-  (defn example-effect [inputs]
-    ;; returns a vector of messages which effect the outside world
-    )
-
-  ;; continue
-
-  (defn example-continue [inputs]
-    ;; returns a vector of messages which will be processed as part of
-    ;; the same dataflow transaction
-    )
-
-  ;; dataflow description reference
-
-  {:transform [[:op [:path] example-transform]]
-   :derive    #{[#{[:in]} [:path] example-derive]}
-   :effect    #{[#{[:in]} example-effect]}
-   :continue  #{[#{[:in]} example-continue]}
-   :emit      [[#{[:in]} example-emit]]}
-  )

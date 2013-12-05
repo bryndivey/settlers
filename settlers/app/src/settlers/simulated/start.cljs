@@ -1,6 +1,8 @@
 (ns settlers.simulated.start
-  (:require [io.pedestal.app.render.push.handlers.automatic :as d]
+  (:require [io.pedestal.app :as app]
+            [io.pedestal.app.render.push.handlers.automatic :as d]
             [settlers.start :as start]
+            [settlers.simulated.services :as services]
             [settlers.rendering :as rendering]
             [goog.Uri]
             ;; This needs to be included somewhere in order for the
@@ -12,11 +14,8 @@
     (.getParameterValue uri name)))
 
 (defn ^:export main []
-  ;; Create an application which uses the data renderer. The :data-ui
-  ;; aspect is configured to run this main function. See
-  ;;
-  ;; config/config.edn
-  ;;
-  (start/create-app (if (= "auto" (param "renderer"))
-                      d/data-renderer-config
-                      (rendering/render-config))))
+  (let [app (start/create-app (if (= "auto" (param "renderer"))
+                                d/data-renderer-config
+                                (rendering/render-config)))]
+    (app/consume-effects (:app app) services/services-fn)
+    app))

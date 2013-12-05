@@ -7,7 +7,7 @@
      :name name
      :resources {:wood 0
                  :ore 0
-                 :wheat 0
+                 :grain 0
                  :wool 0
                  :brick 0}
      :hand []
