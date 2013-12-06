@@ -151,7 +151,7 @@
     (doseq [[i p] (map vector (range) (vals (:players g)))]
       (let [p (draw-player ctx p)]
         (.log js/console "P" p)
-        (c/move-to! p 700 (+ 20 (* i 40)))
+        (c/move-to! p 600 (+ 20 (* i 40)))
 ))
     ))
 
