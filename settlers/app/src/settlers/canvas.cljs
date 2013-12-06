@@ -83,3 +83,6 @@
     ; TODO - y
     (transform! o (format "t%d,%d" (/  (.-width bbox) 2) 0))
     o))
+
+(defn remove! [o]
+  (.remove o))

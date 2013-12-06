@@ -1,11 +1,14 @@
 (ns settlers.drawing
-  (:require [domina :as dom]
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [cljs.core.async :refer [put! chan <! <!!]]
+            [domina :as dom]
             [domina.css :as css]
             [io.pedestal.app.util.log :as log]
             [settlers.map :as map]
             [settlers.canvas :as c]
             [settlers.game :as game]
-            [settlers.create :as create]))
+            [settlers.create :as create]
+            ))
 
 (def terrains [:pasture :pasture :mountain :desert :pasture :hill :field :mountain :field :field :forest :field :forest :hill :mountain :forest :pasture :hill :forest])
 
@@ -134,11 +137,29 @@
   (-> (c/circle ctx 0 0 10)
       (move-to-vertex position)
       (c/set-fill! "#FFF")
-      (c/set-onclick! (fn [e] (.log js/console e)))))
+      (c/set-onclick! (fn [e]
+                        (.log js/console "CALLING")
+                        (cb (str position))))))
 
-(defn draw-vertices-selector [ctx cb vs]
+
+
+(defn draw-vertex-selectors [ctx cb vs]
   "Draw vertices vs and hook them to callback cb"
-  (doall (map #(draw-vertex-selector ctx cb %) vs)))
+  (apply c/set ctx (map #(draw-vertex-selector ctx cb %) vs)))
+
+
+(def vertex-selectors (atom {}))
+
+(defn del-vertex-selector [i]
+  (c/remove! (@vertex-selectors i))
+)
+
+(defn select-vertex [ctx cb vs]
+  (let [id (gensym)
+        sels (draw-vertex-selectors ctx #(do (del-vertex-selector id)
+                                              (cb %))
+                                     vs)]
+    (swap! vertex-selectors assoc id sels)))
 
 
 (defn draw-game [n g]
@@ -165,12 +186,10 @@
         (c/move-to! p 600 (+ 20 (* i 40)))))
 
     (let [vertices (map/all-vertices (game/game-faces g))]
-      (draw-vertices-selector ctx nil vertices))))
+      (select-vertex ctx #(.log js/console %) vertices))))
 
 
-(defn initialize []
-  (let [n (dom/by-id "canvas")]
-    (draw-game n g)))
+(defn initialize [])
 
 
 (defn render [g]
