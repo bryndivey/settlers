@@ -73,6 +73,10 @@
 
 
 
+(defn game-faces [g]
+  "All faces in play in the game g"
+  (map :position (filter identity (apply concat (:map g)))))
+
 
 (defn valid-action [t a]
   "Is this action valid in the current move type?"

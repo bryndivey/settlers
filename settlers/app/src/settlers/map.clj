@@ -1,5 +1,4 @@
-(ns ^:shared settlers.map
-    (:require [clojure.math.combinatorics :as combo]))
+(ns ^:shared settlers.map)
 
 (defn a2c [[q r]]
   "Axial co-ords to cube co-ords"
@@ -41,13 +40,15 @@
   [m p]
   (filter identity (map (partial get-qr m) (face-neighbours p))))
 
+(defn abs [n]
+  (if (neg? n) (- n) n))
+
 (defn distance [[q1 r1] [q2 r2]]
   "Distance between two faces"
-  (let [abs #(java.lang.Math/abs %)]
-    (/ (+ (abs (- q1 q2))
-          (abs (- r1 r2))
-          (abs (- (+ q1 r1) q2 r2)))
-       2)))
+  (/ (+ (abs (- q1 q2))
+        (abs (- r1 r2))
+        (abs (- (+ q1 r1) q2 r2)))
+     2))
 
 (defn adjacent? [fs]
   (every? #(<= % 1) (for [f1 fs
@@ -95,10 +96,24 @@
       :n [(:nw neighbours) (:ne neighbours) f]
       :w [(:w neighbours) (:nw neighbours) f])))
 
+
 (defn all-vertices [fs]
   "All possible vertices for input faces"
-  (let [all-map-faces (faces-expand fs)]
-    (set (map v3-to-v1 (filter adjacent? (combo/combinations all-map-faces 3))))))
+  (let [fs' (set fs)
+        all-fs (reduce #(into %1 (map (face-dir-neighbours %2) [:e :se :sw]))
+                       fs' fs')
+        all-fs' (filter #(or (fs' (:nw (face-dir-neighbours %)))
+                             (fs' %)) all-fs)
+        n-fs (filter #(fs' (:ne (face-dir-neighbours %))) all-fs)
+        w-fs (filter #(fs' (:w (face-dir-neighbours %))) all-fs)
+
+        both-vertices (reduce #(into %1 [[%2 :n] [%2 :w]]) #{} all-fs')
+        plus-north (reduce #(into %1 [[%2 :n]]) both-vertices n-fs)
+        plus-west (reduce #(into %1 [[%2 :w]]) plus-north w-fs)
+        ]
+    plus-west
+))
+
 
 ;; edges
 ;; edges are two faces, which are a q and r each

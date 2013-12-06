@@ -4,6 +4,7 @@
             [io.pedestal.app.util.log :as log]
             [settlers.map :as map]
             [settlers.canvas :as c]
+            [settlers.game :as game]
             [settlers.create :as create]))
 
 (def terrains [:pasture :pasture :mountain :desert :pasture :hill :field :mountain :field :field :forest :field :forest :hill :mountain :forest :pasture :hill :forest])
@@ -97,8 +98,6 @@
     :settlement (draw-settlement ctx obj)
     :city (draw-city ctx obj)))
 
-
-
 (defn draw-road [ctx obj]
   (let [[f1 f2] (:position obj)
         dir (map/e-dir (:position obj))
@@ -112,9 +111,7 @@
                           :y [180 (:se points) "4,0"]
                           :z [120 (:s points) "2,-3"])]
     (c/transform! road (format "R%d,0,0T%d,%dT%s" angle (first pos) (second pos) off))
-    (color-for-player road (:player obj))
-
-))
+    (color-for-player road (:player obj))))
 
 (defn draw-edge-object [ctx obj]
   (case (:type obj)
@@ -130,7 +127,22 @@
     (c/move-to-origin! resources)
     (c/set ctx name resources)))
 
+
+
+
+(defn draw-vertex-selector [ctx cb position]
+  (-> (c/circle ctx 0 0 10)
+      (move-to-vertex position)
+      (c/set-fill! "#FFF")
+      (c/set-onclick! (fn [e] (.log js/console e)))))
+
+(defn draw-vertices-selector [ctx cb vs]
+  "Draw vertices vs and hook them to callback cb"
+  (doall (map #(draw-vertex-selector ctx cb %) vs)))
+
+
 (defn draw-game [n g]
+  (dom/destroy-children! n)
   (let [ctx (c/get-context "canvas" 1000 600)
         background (c/set-fill! (c/rect ctx 0 0 1000 600) "#77f")]
                                         ; tiles
@@ -150,17 +162,17 @@
                                         ;players
     (doseq [[i p] (map vector (range) (vals (:players g)))]
       (let [p (draw-player ctx p)]
-        (.log js/console "P" p)
-        (c/move-to! p 600 (+ 20 (* i 40)))
-))
-    ))
+        (c/move-to! p 600 (+ 20 (* i 40)))))
+
+    (let [vertices (map/all-vertices (game/game-faces g))]
+      (draw-vertices-selector ctx nil vertices))))
 
 
 (defn initialize []
   (let [n (dom/by-id "canvas")]
     (draw-game n g)))
 
+
 (defn render [g]
+  
   (draw-game (dom/by-id "canvas") g))
-
-
