@@ -1,4 +1,5 @@
-(ns ^:shared settlers.map)
+(ns ^:shared settlers.map
+    (:require [clojure.math.combinatorics :as combo]))
 
 (defn a2c [[q r]]
   "Axial co-ords to cube co-ords"
@@ -31,6 +32,10 @@
   (for [[q' r'] [[1 0] [1 -1] [0 -1] [-1 0] [-1 1] [0 1]]]
     [(+ q q') (+ r r')]))
 
+(defn face-dir-neighbours [f]
+  "Neighbours in cardinal directions"
+  (into {} (map vector [:se :sw :w :nw :ne :e] (face-neighbours f))))
+
 (defn get-neighbours 
   "Get the neighbouring faces of a [q r] face"
   [m p]
@@ -44,13 +49,21 @@
           (abs (- (+ q1 r1) q2 r2)))
        2)))
 
+(defn adjacent? [fs]
+  (every? #(<= % 1) (for [f1 fs
+                          f2 fs] (distance f1 f2))))
+
 (defn set-qr [m [q r] v]
   (let [i (map (partial norm-pos m) [q r])]
     (assoc-in m i v)))
 
 (defn faces-expand [fs]
-  "Expand given faces by one neighbouring set (for the sea edges"
+  "Expand given faces by one neighbouring set (for the sea edges)"
   (set (reduce #(into %1 (face-neighbours %2)) fs fs)))
+
+(defn order-faces [fs]
+  "Order faces into vector on q ordering"
+  (sort-by first (sort-by second (vec fs))))
 
 ;; vertices
 ;; face + n/w 
@@ -65,19 +78,36 @@
         (= d :w) [[q r] [(- q 1) r] [q (- r 1)]]
         :else (throw (Exception. (str "Invalid direction" d)))))
 
+
+(defn v3-to-v1 [fs]
+  "Convert a 3-face vertices to a 1-face, 1-dir vertex"
+  (let [ordered (order-faces fs)
+        ; are there more above or below
+        weight (vals (frequencies (map first ordered)))]
+    [(last ordered) (case weight
+                      [1 2] :w
+                      [2 1] :n)]))
+
+(defn v1-to-v3 [[f d]]
+  "Convert a 1-face 1-dir vertex to 3 faces"
+  (let [neighbours (face-dir-neighbours f)]
+    (case d
+      :n [(:nw neighbours) (:ne neighbours) f]
+      :w [(:w neighbours) (:nw neighbours) f])))
+
 (defn all-vertices [fs]
-  "All possible vertices for input faces")
+  "All possible vertices for input faces"
+  (let [all-map-faces (faces-expand fs)]
+    (set (map v3-to-v1 (filter adjacent? (combo/combinations all-map-faces 3))))))
 
 ;; edges
 ;; edges are two faces, which are a q and r each
 
-(defn order-e [e]
-  "Order set e into vector on q ordering"
-  (sort-by first (sort-by second (vec e))))
+
 
 (defn e-dir [e]
   "Get the 'direction' between two faces."
-  (let [[[q1 r1] [q2 r2]] (order-e e)]
+  (let [[[q1 r1] [q2 r2]] (order-faces e)]
     (cond
      (= r1 r2) :x
      (= q1 q2) :y
@@ -94,7 +124,7 @@
 
 (defn e-opposite-tiles [e]
   "get the 'opposite' tiles to find neighbouring edges"
-  (let [[[q1 r1] [q2 r2]] (order-e e)]
+  (let [[[q1 r1] [q2 r2]] (order-faces e)]
     (case (e-dir e)
       :x [[q1 (+ r1 1)] [q2 (- r2 1)]]
       :y [[(- q1 1) (+ r1 1)] [(+ q2 1) (- r2 1)]]
@@ -102,7 +132,7 @@
 
 (defn e-neighbours [e]
   "Get neighbouring edges for an edge"
-  (let [ordered (order-e e)
+  (let [ordered (order-faces e)
         f1 (first ordered)
         f2 (second ordered)
         [f3 f4] (e-opposite-tiles [f1 f2])]

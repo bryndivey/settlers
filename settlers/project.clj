@@ -6,7 +6,8 @@
                  [ch.qos.logback/logback-classic "1.0.13" :exclusions [org.slf4j/slf4j-api]]
                  [io.pedestal/pedestal.app "0.2.2"]
                  [io.pedestal/pedestal.app-tools "0.2.2"]
-                 [com.cemerick/piggieback "0.1.0"]]
+                 [com.cemerick/piggieback "0.1.0"]
+                 [org.clojure/math.combinatorics "0.0.7"]]
   :min-lein-version "2.0.0"
   :source-paths ["app/src" "app/templates"]
   :resource-paths ["config"]

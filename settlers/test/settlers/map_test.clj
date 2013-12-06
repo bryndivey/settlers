@@ -34,5 +34,7 @@
          (set (get-neighbours test-map-1 [1 1])))))
 
 
-
-
+(deftest t-all-vertices
+  (is (= 6 (count (all-vertices [[0 0]]))))
+  (is (= 10 (count (all-vertices [[0 0] [0 1]]))))
+  (is (= 12 (count (all-vertices [[0 0] [3 3]])))))

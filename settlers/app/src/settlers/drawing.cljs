@@ -104,7 +104,7 @@
         dir (map/e-dir (:position obj))
         road (c/rect ctx 0 0 8 hex-size)
         road (c/rotate! road 180)
-        ordered (map/order-e [f1 f2])
+        ordered (map/order-faces [f1 f2])
         {:keys [x y]} (c/hex-position (first ordered) hex-size)
         points (c/hex-points x y hex-size)
         [angle pos off] (case dir
