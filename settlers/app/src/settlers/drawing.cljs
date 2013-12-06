@@ -1,6 +1,6 @@
 (ns settlers.drawing
   (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [cljs.core.async :refer [put! chan <! <!!]]
+  (:require [cljs.core.async :refer [put! chan >! <! <!! timeout]]
             [domina :as dom]
             [domina.css :as css]
             [io.pedestal.app.util.log :as log]
@@ -101,11 +101,13 @@
     :settlement (draw-settlement ctx obj)
     :city (draw-city ctx obj)))
 
-(defn draw-road [ctx obj]
-  (let [[f1 f2] (:position obj)
-        dir (map/e-dir (:position obj))
-        road (c/rect ctx 0 0 8 hex-size)
-        road (c/rotate! road 180)
+
+
+(defn draw-edge [ctx position]
+  (let [[f1 f2] position
+        dir (map/e-dir position)
+        edge (c/rect ctx 0 0 8 hex-size)
+        edge (c/rotate! edge 180)
         ordered (map/order-faces [f1 f2])
         {:keys [x y]} (c/hex-position (first ordered) hex-size)
         points (c/hex-points x y hex-size)
@@ -113,8 +115,11 @@
                           :x [-120 (:s points) "2,4"]
                           :y [180 (:se points) "4,0"]
                           :z [120 (:s points) "2,-3"])]
-    (c/transform! road (format "R%d,0,0T%d,%dT%s" angle (first pos) (second pos) off))
-    (color-for-player road (:player obj))))
+    (c/transform! edge (format "R%d,0,0T%d,%dT%s" angle (first pos) (second pos) off))))
+
+(defn draw-road [ctx obj]
+  (-> (draw-edge ctx (:position obj))
+      (color-for-player (:player obj))))
 
 (defn draw-edge-object [ctx obj]
   (case (:type obj)
@@ -132,27 +137,22 @@
 
 
 
+;; vertex selection
+
+(def vertex-selectors (atom {}))
 
 (defn draw-vertex-selector [ctx cb position]
   (-> (c/circle ctx 0 0 10)
       (move-to-vertex position)
       (c/set-fill! "#FFF")
-      (c/set-onclick! (fn [e]
-                        (.log js/console "CALLING")
-                        (cb (str position))))))
-
-
+      (c/set-onclick! (fn [e] (cb (str position))))))
 
 (defn draw-vertex-selectors [ctx cb vs]
   "Draw vertices vs and hook them to callback cb"
   (apply c/set ctx (map #(draw-vertex-selector ctx cb %) vs)))
 
-
-(def vertex-selectors (atom {}))
-
 (defn del-vertex-selector [i]
-  (c/remove! (@vertex-selectors i))
-)
+  (c/remove! (@vertex-selectors i)))
 
 (defn select-vertex [ctx cb vs]
   (let [id (gensym)
@@ -160,6 +160,30 @@
                                               (cb %))
                                      vs)]
     (swap! vertex-selectors assoc id sels)))
+
+
+;; edge selection
+
+(def edge-selectors (atom {}))
+
+(defn draw-edge-selector [ctx cb position]
+  (-> (draw-edge ctx position)
+      (c/set-fill! "#FFF")
+      (c/set-onclick! (fn [e] (cb (str position))))))
+
+(defn draw-edge-selectors [ctx cb es]
+  "Draw edge es and hook them to callback cb"
+  (apply c/set ctx (map #(draw-edge-selector ctx cb %) es)))
+
+(defn del-edge-selector [i]
+  (c/remove! (@edge-selectors i)))
+
+(defn select-edge [ctx cb es]
+  (let [id (gensym)
+        sels (draw-edge-selectors ctx #(do (del-edge-selector id)
+                                           (cb %))
+                                     es)]
+    (swap! edge-selectors assoc id sels)))
 
 
 (defn draw-game [n g]
@@ -185,13 +209,15 @@
       (let [p (draw-player ctx p)]
         (c/move-to! p 600 (+ 20 (* i 40)))))
 
-    (let [vertices (map/all-vertices (game/game-faces g))]
-      (select-vertex ctx #(.log js/console %) vertices))))
+    (comment let [vertices (map/all-vertices (game/game-faces g))]
+      (select-vertex ctx #(.log js/console %) vertices))
 
+    (select-edge ctx #(.log js/console %) (map/faces-edges (game/game-faces g)))))
 
 (defn initialize [])
 
-
 (defn render [g]
-  
   (draw-game (dom/by-id "canvas") g))
+
+
+
