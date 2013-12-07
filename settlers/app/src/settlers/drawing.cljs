@@ -140,6 +140,11 @@
    (c/text ctx 0 0 (str n))
    10 10))
 
+(defn draw-last-move [ctx l]
+  (c/move! 
+   (c/text ctx 0 0 (str l))
+   10 30))
+
 
 
 ;; vertex selection
@@ -199,9 +204,16 @@
     (-> (c/text ctx 0 0 "Build road")
         (c/set-onclick! #(select-edge ctx afn (map/faces-edges (game/game-faces g)))))))
 
+(defn draw-end-turn-action [ctx g move-fn]
+  (let [afn (fn [] (move-fn {:action :end-turn}))]
+    (-> (c/text ctx 0 40 "End turn")
+        (c/set-onclick! afn))))
+
 (defn draw-actions [ctx g move-fn]
-  (-> (c/set ctx (draw-build-road-action ctx g move-fn)
-             (draw-build-settlement-action ctx g move-fn))
+  (-> (c/set ctx
+             (draw-build-road-action ctx g move-fn)
+             (draw-build-settlement-action ctx g move-fn)
+             (draw-end-turn-action ctx g move-fn))
       
       (c/move! 600 10)))
 
@@ -237,6 +249,7 @@
       (select-vertex ctx #(.log js/console %) vertices))
 
     (draw-next-move ctx (:next-move g))
+    (draw-last-move ctx (last (:moves g)))
     (comment select-edge ctx #(.log js/console %) (map/faces-edges (game/game-faces g)))))
 
 (defn initialize [])
