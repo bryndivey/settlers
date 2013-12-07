@@ -8,6 +8,7 @@
             [settlers.canvas :as c]
             [settlers.game :as game]
             [settlers.create :as create]
+            [settlers.actions :as actions]
             ))
 
 (def terrains [:pasture :pasture :mountain :desert :pasture :hill :field :mountain :field :field :forest :field :forest :hill :mountain :forest :pasture :hill :forest])
@@ -172,9 +173,15 @@
     (swap! vertex-selectors assoc id sels)))
 
 (defn draw-build-settlement-action [ctx g move-fn]
-  (let [afn (fn [p] (move-fn {:action :build-settlement :target p}))]
+  (let [afn (fn [p'] (move-fn {:action :build-settlement :target p'}))
+        draw (fn []
+               (let [player ((-> g :next-move :player) (:players g))
+                     possibilities (filter #(actions/v-settlement-location
+                                             g player {:target %})
+                                           (map/all-vertices (game/game-faces g)))]
+                 (select-vertex ctx afn possibilities)))]
     (-> (c/text ctx 0 20 "Build settlement")
-        (c/set-onclick! #(select-vertex ctx afn (map/all-vertices (game/game-faces g)))))))
+        (c/set-onclick! draw))))
 
 ;; edge selection
 
@@ -200,9 +207,15 @@
     (swap! edge-selectors assoc id sels)))
 
 (defn draw-build-road-action [ctx g move-fn]
-  (let [afn (fn [p] (move-fn {:action :build-road :target p}))]
+  (let [afn (fn [p'] (move-fn {:action :build-road :target p'}))
+        draw (fn []
+               (let [player ((-> g :next-move :player) (:players g))
+                     possibilities (filter #(actions/v-road-location
+                                             g player {:target %})
+                                           (map/faces-edges (game/game-faces g)))]
+                 (select-edge ctx afn possibilities)))]
     (-> (c/text ctx 0 0 "Build road")
-        (c/set-onclick! #(select-edge ctx afn (map/faces-edges (game/game-faces g)))))))
+        (c/set-onclick! draw))))
 
 (defn draw-end-turn-action [ctx g move-fn]
   (let [afn (fn [] (move-fn {:action :end-turn}))]
