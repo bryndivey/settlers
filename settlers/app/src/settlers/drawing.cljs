@@ -135,6 +135,11 @@
     (c/move-to-origin! resources)
     (c/set ctx name resources)))
 
+(defn draw-next-move [ctx n]
+  (c/move! 
+   (c/text ctx 0 0 (str n))
+   10 10))
+
 
 
 ;; vertex selection
@@ -145,7 +150,7 @@
   (-> (c/circle ctx 0 0 10)
       (move-to-vertex position)
       (c/set-fill! "#FFF")
-      (c/set-onclick! (fn [e] (cb (str position))))))
+      (c/set-onclick! (fn [e] (cb position)))))
 
 (defn draw-vertex-selectors [ctx cb vs]
   "Draw vertices vs and hook them to callback cb"
@@ -161,6 +166,10 @@
                                      vs)]
     (swap! vertex-selectors assoc id sels)))
 
+(defn draw-build-settlement-action [ctx g move-fn]
+  (let [afn (fn [p] (move-fn {:action :build-settlement :target p}))]
+    (-> (c/text ctx 0 20 "Build settlement")
+        (c/set-onclick! #(select-vertex ctx afn (map/all-vertices (game/game-faces g)))))))
 
 ;; edge selection
 
@@ -169,7 +178,7 @@
 (defn draw-edge-selector [ctx cb position]
   (-> (draw-edge ctx position)
       (c/set-fill! "#FFF")
-      (c/set-onclick! (fn [e] (cb (str position))))))
+      (c/set-onclick! (fn [e] (cb position)))))
 
 (defn draw-edge-selectors [ctx cb es]
   "Draw edge es and hook them to callback cb"
@@ -185,8 +194,20 @@
                                      es)]
     (swap! edge-selectors assoc id sels)))
 
+(defn draw-build-road-action [ctx g move-fn]
+  (let [afn (fn [p] (move-fn {:action :build-road :target p}))]
+    (-> (c/text ctx 0 0 "Build road")
+        (c/set-onclick! #(select-edge ctx afn (map/faces-edges (game/game-faces g)))))))
 
-(defn draw-game [n g]
+(defn draw-actions [ctx g move-fn]
+  (-> (c/set ctx (draw-build-road-action ctx g move-fn)
+             (draw-build-settlement-action ctx g move-fn))
+      
+      (c/move! 600 10)))
+
+
+
+(defn draw-game [n g move-fn]
   (dom/destroy-children! n)
   (let [ctx (c/get-context "canvas" 1000 600)
         background (c/set-fill! (c/rect ctx 0 0 1000 600) "#77f")]
@@ -204,20 +225,25 @@
     (doseq [[_ obj] (:vertices g)]
       (draw-vertex-object ctx obj))
 
+
+    (draw-actions ctx g move-fn)
+
                                         ;players
     (doseq [[i p] (map vector (range) (vals (:players g)))]
       (let [p (draw-player ctx p)]
-        (c/move-to! p 600 (+ 20 (* i 40)))))
+        (c/move-to! p 600 (+ 140 (* i 40)))))
 
     (comment let [vertices (map/all-vertices (game/game-faces g))]
       (select-vertex ctx #(.log js/console %) vertices))
 
-    (select-edge ctx #(.log js/console %) (map/faces-edges (game/game-faces g)))))
+    (draw-next-move ctx (:next-move g))
+    (comment select-edge ctx #(.log js/console %) (map/faces-edges (game/game-faces g)))))
 
 (defn initialize [])
 
-(defn render [g]
-  (draw-game (dom/by-id "canvas") g))
+(defn render [g move-fn]
+  (draw-game (dom/by-id "canvas") g move-fn))
+
 
 
 

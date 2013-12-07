@@ -5,9 +5,9 @@
 
 
 (defn text [ctx x y text]
-  (.attr 
-   (.text ctx x y text)
-   "text-anchor" "start"))
+  (let [t (.text ctx x y text)]
+    (.attr t"text-anchor" "start")
+    t))
 
 (defn centered-text [ctx x y t]
   "x and y define the midpoint of the text, not the top-left"

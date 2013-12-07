@@ -85,6 +85,7 @@
                               :build-city
                               :buy-development-card
                               :end-turn}}]
+    (.log js/console "V" t a)
     (boolean ((v-map t) a))))
 
 (defn next-player [g p]
@@ -93,6 +94,7 @@
 (defn game-loop
   ([g] g)
   ([g m]
+     (.log js/console "LOOP" m)
      (let [action (:action m)]
        (if (valid-action (-> g :next-move :type) action)
          (if (valid-move? g m)

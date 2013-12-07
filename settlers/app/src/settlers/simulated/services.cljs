@@ -11,6 +11,7 @@
                               :value g}))
 
 (defn perform-move [input-queue g m]
+  (.log js/console "MOVE" (str m))
   (let [valid (actions/valid-move? g m)]
     (if valid
       (let [n (game/game-loop g m)]
@@ -24,6 +25,7 @@
     (new-game input-queue n)))
 
 (defn services-fn [message input-queue]
+  (log/info "move" message)
   (let [type (msg/type message)]
     (cond
      (= type :perform-move) (perform-move input-queue
