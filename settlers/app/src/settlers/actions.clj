@@ -26,9 +26,10 @@
 
 (defn validators-pass? [vfns game player args]
   (let [do-validate (fn [vfn]
-                      (vfn game player args))]
+                      (vfn game player args))
+        results (map do-validate vfns)]
     (or (not vfns)
-        (every? true? (map do-validate vfns)))))
+        (every? true? results))))
 
 
 (defn valid-move? [game move]
@@ -57,33 +58,34 @@
 
 ;; actual moves
 
+(defn v-on-road [g p a]
+  (let [v (:target a)
+        v-faces (vertex-to-faces v)
+        roads (filter #(and (= (:id p) (:player %))
+                            (= :road (:type %))) (vals (:edges g)))
+        road-positions (map :position roads)]
+    (some #(= (count (intersection (set v-faces) %)) 2)
+          road-positions)))
 
+(defn v-settlement-distance [g p a]
+  (let [v (:target a)
+        v-faces (vertex-to-faces v)
+        settlement-vertices (for [[v' s] (:vertices g)
+                                  :when (#{:settlement :city} (:type s))]
+                              v')
+        used-faces (map vertex-to-faces settlement-vertices)
+        t (fn [fs]
+            (> (count (intersection (set fs) (set v-faces)))
+               1))]
+    (boolean (not-any? t used-faces))))
 
 (defn v-settlement-location [g p a]
   "Is this vertex a valid place for a new settlement?
    Test - must not share more than one faces with an existing settlement
         - must contain the two faces from a road of this player"
 
-  (let [v (:target a)
-        v-faces (vertex-to-faces v)]
-    ;; check that v-faces includes the faces from some player road
-    (let [roads (filter #(and (= (:id p) (:player %))
-                              (= :road (:type %))) (vals (:edges g)))
-          road-positions (map :position roads)
-          valid-for-road (some #(= (count (intersection (set v-faces) %)) 2)
-                               road-positions)]
-      (if valid-for-road
-        ; get all 3-face tuples for existing settlements
-        ; check that the three faces for v share at most one with any of those
-        (let [settlement-vertices (for [[v' s] (:vertices g)
-                                        :when (#{:settlement :city} (:type s))]
-                                    v')
-              used-faces (map vertex-to-faces settlement-vertices)
-              t (fn [fs]
-                  (> (count (intersection (set fs) (set v-faces)))
-                     1))]
-          (not-any? t used-faces))
-        ))))
+  (and (v-on-road g p a)
+       (v-settlement-distance g p a)))
 
 (defn v-building-number [type num]
   "Make a validator to ensure the player hasn't got too many buldings"

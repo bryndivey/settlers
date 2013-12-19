@@ -2,32 +2,25 @@
   (:require [clojure.test :refer :all]
             [settlers.utils :refer [inc-resources]]
             [settlers.create :as create]
-            [settlers.game :refer :all]))
+            [settlers.game :refer :all]
+            [settlers.test-vals :as vals]))
 
-(def terrains [:pasture :pasture :mountain :desert :pasture :hill :field :mountain :field :field :forest :field :forest :hill :mountain :forest :pasture :hill :forest])
-
-(def cards [{:type :road-building} {:type :knight} {:type :victory-point} {:type :knight} {:type :knight} {:type :knight} {:type :knight} {:type :monopoly} {:type :victory-point} {:type :knight} {:type :year-of-plenty} {:type :victory-point} {:type :knight} {:type :victory-point} {:type :monopoly} {:type :knight} {:type :knight} {:type :road-building} {:type :knight} {:type :knight} {:type :knight} {:type :knight} {:type :victory-point} {:type :year-of-plenty} {:type :knight}])
-
-(def game (create/-create-game terrains cards))
+(def g vals/game)
 
 (deftest t-basic
-  (let [g (-> game
-              (create/add-player "Bryn"))]
-    (is (= (tiles-for-vertex g [[0 0] :n])
-           '({:terrain :forest, :roll 11, :position [0 0]}
-             {:terrain :hill, :roll 3, :position [-1 0]}
-             {:terrain :pasture, :roll 6, :position [-1 1]})))
+  (is (= (tiles-for-vertex g [[0 0] :n])
+         '({:terrain :forest, :roll 11, :position [0 0]}
+           {:terrain :hill, :roll 3, :position [-1 0]}
+           {:terrain :pasture, :roll 6, :position [-1 1]})))
 
-    (is (= (tiles-for-vertex g [[-2 3] :w])
-           '({:terrain :field, :roll 12 :position [-2 2]})))
+  (is (= (tiles-for-vertex g [[-2 3] :w])
+         '({:terrain :field, :roll 12 :position [-2 2]})))
 
-    (is (= (tiles-for-vertex g [[2 -2] :w])
-           '({:terrain :mountain, :roll 6 :position [2 -2]}
-             {:terrain :pasture, :roll 2 :position [1 -2]})))
-    ))
+  (is (= (tiles-for-vertex g [[2 -2] :w])
+         '({:terrain :mountain, :roll 6 :position [2 -2]}
+           {:terrain :pasture, :roll 2 :position [1 -2]})))
+  )
 
-
-(def g (create terrains cards))
 
 (deftest t-resources
   (is (= '({:brick 1, :wood 0, :ore 0, :wool 0, :grain 1}
