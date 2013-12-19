@@ -157,10 +157,9 @@
 ;; city building
 
 (defn v-city-location [g p a]
-  (if-let [cur ((:target a) (:vertices g))]
+  (if-let [cur (get (:vertices g) (:target a))]
     (and (= (:player cur) (:id p))
-         (= (:type cur) :settlement))
-    true))
+         (= (:type cur) :settlement))))
 
 (let [cost {:ore 3 :grain 2}]
   (defaction :build-city

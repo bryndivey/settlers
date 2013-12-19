@@ -178,10 +178,21 @@
                (let [player ((-> g :next-move :player) (:players g))
                      possibilities (filter #(actions/v-settlement-location
                                              g player {:target %})
-                                           (map/all-vertices (game/game-faces g)))
-                     _ (.log js/console "POSS" (str possibilities))]
+                                           (map/all-vertices (game/game-faces g)))]
                  (select-vertex ctx afn possibilities)))]
     (-> (c/text ctx 0 20 "Build settlement")
+        (c/set-onclick! draw))))
+
+(defn draw-build-city-action [ctx g move-fn]
+  (let [afn (fn [p'] (move-fn {:action :build-city :target p'}))
+        draw (fn []
+               (let [player ((-> g :next-move :player) (:players g))
+                     possibilities (filter #(actions/v-city-location
+                                             g player {:target %})
+                                           (map/all-vertices (game/game-faces g)))]
+                 (.log js/console "POSS" (str possibilities))
+                 (select-vertex ctx afn possibilities)))]
+    (-> (c/text ctx 0 40 "Build city")
         (c/set-onclick! draw))))
 
 ;; edge selection
@@ -220,13 +231,14 @@
 
 (defn draw-end-turn-action [ctx g move-fn]
   (let [afn (fn [] (move-fn {:action :end-turn}))]
-    (-> (c/text ctx 0 40 "End turn")
+    (-> (c/text ctx 0 60 "End turn")
         (c/set-onclick! afn))))
 
 (defn draw-actions [ctx g move-fn]
   (-> (c/set ctx
              (draw-build-road-action ctx g move-fn)
              (draw-build-settlement-action ctx g move-fn)
+             (draw-build-city-action ctx g move-fn)
              (draw-end-turn-action ctx g move-fn))
       
       (c/move! 600 10)))
