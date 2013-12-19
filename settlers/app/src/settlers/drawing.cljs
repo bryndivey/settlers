@@ -178,7 +178,8 @@
                (let [player ((-> g :next-move :player) (:players g))
                      possibilities (filter #(actions/v-settlement-location
                                              g player {:target %})
-                                           (map/all-vertices (game/game-faces g)))]
+                                           (map/all-vertices (game/game-faces g)))
+                     _ (.log js/console "POSS" (str possibilities))]
                  (select-vertex ctx afn possibilities)))]
     (-> (c/text ctx 0 20 "Build settlement")
         (c/set-onclick! draw))))

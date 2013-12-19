@@ -118,6 +118,7 @@
          (create/add-road :bryn #{[0 0] [-1 0]})
          (create/add-settlement :bryn [[2 -2] :n])
          (create/add-road :bryn #{[1 -2] [1 -1]})
+         (create/add-road :bryn #{[0 -1] [0 0]})
          
          (create/add-settlement :mark [[1 1] :n])
          (create/add-road :mark #{[1 1] [0 1]})

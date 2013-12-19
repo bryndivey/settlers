@@ -57,22 +57,33 @@
 
 ;; actual moves
 
-(defn v-settlement-location [g _ a]
-  "Is this vertex a valid place for a new settlement?
-   Test - does it share two faces with an existing settlement"
 
-  ; get all 3-face tuples for existing settlements
-  ; check that the three faces for v share at most one with any of those
+
+(defn v-settlement-location [g p a]
+  "Is this vertex a valid place for a new settlement?
+   Test - must not share more than one faces with an existing settlement
+        - must contain the two faces from a road of this player"
+
   (let [v (:target a)
-        settlement-vertices (for [[v' s] (:vertices g)
-                                  :when (#{:settlement :city} (:type s))]
-                              v')
-        used-faces (map vertex-to-faces settlement-vertices)
-        v-faces (vertex-to-faces v)
-        t (fn [fs]
-            (> (count (intersection (set fs) (set v-faces)))
-               1))]
-    (not-any? t used-faces)))
+        v-faces (vertex-to-faces v)]
+    ;; check that v-faces includes the faces from some player road
+    (let [roads (filter #(and (= (:id p) (:player %))
+                              (= :road (:type %))) (vals (:edges g)))
+          road-positions (map :position roads)
+          valid-for-road (some #(= (count (intersection (set v-faces) %)) 2)
+                               road-positions)]
+      (if valid-for-road
+        ; get all 3-face tuples for existing settlements
+        ; check that the three faces for v share at most one with any of those
+        (let [settlement-vertices (for [[v' s] (:vertices g)
+                                        :when (#{:settlement :city} (:type s))]
+                                    v')
+              used-faces (map vertex-to-faces settlement-vertices)
+              t (fn [fs]
+                  (> (count (intersection (set fs) (set v-faces)))
+                     1))]
+          (not-any? t used-faces))
+        ))))
 
 (defn v-building-number [type num]
   "Make a validator to ensure the player hasn't got too many buldings"
