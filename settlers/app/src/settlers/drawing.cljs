@@ -129,9 +129,10 @@
 (defn draw-player [ctx p]
   "Draw player info"
   (let [name (c/text ctx 0 0 (:name p))
-        resources (c/text ctx 0 15 (apply str (doall (for [[k v] (:resources p)]
+        r (assoc (:resources p) :cards (count (:hand p)))
+        resources (c/text ctx 0 15 (apply str (doall (for [[k v] r]
                                                           (str k ":" v " ")))))]
-    (doall (map #(.attr % "font-size" 18) [name resources]))
+    (doall (map #(.attr % "font-size" 12) [name resources]))
     (c/move-to-origin! name)
     (c/move-to-origin! resources)
     (c/set ctx name resources)))
@@ -195,6 +196,10 @@
     (-> (c/text ctx 0 40 "Build city")
         (c/set-onclick! draw))))
 
+(defn draw-buy-development-card-action [ctx g move-fn]
+  (-> (c/text ctx 0 60 "Buy card")
+      (c/set-onclick! (fn [] (move-fn {:action :buy-development-card})))))
+
 ;; edge selection
 
 (def edge-selectors (atom {}))
@@ -231,7 +236,7 @@
 
 (defn draw-end-turn-action [ctx g move-fn]
   (let [afn (fn [] (move-fn {:action :end-turn}))]
-    (-> (c/text ctx 0 60 "End turn")
+    (-> (c/text ctx 0 80 "End turn")
         (c/set-onclick! afn))))
 
 (defn draw-actions [ctx g move-fn]
@@ -239,6 +244,7 @@
              (draw-build-road-action ctx g move-fn)
              (draw-build-settlement-action ctx g move-fn)
              (draw-build-city-action ctx g move-fn)
+             (draw-buy-development-card-action ctx g move-fn)
              (draw-end-turn-action ctx g move-fn))
       
       (c/move! 600 10)))
