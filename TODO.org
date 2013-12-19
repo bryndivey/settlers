@@ -1,1 +1,3 @@
 - grr, I'm placing rolls clockwise, not counter-clockwise
+- settlement-placement rules not being observed
+- settlements not terminating road-building

@@ -17,9 +17,9 @@
            (inc-resources :bryn {:wood 1 :wool 1 :brick 1 :grain 1 :ore 1})))
 
 (deftest t-v-settlement
-  (is (= true (v-settlement-location g nil {:target [[0 1] :w]})))  
+  (is (= false (v-settlement-location g nil {:target [[0 1] :w]})))  
   (is (= false (v-settlement-location g nil {:target [[0 0] :w]})))
-  (is (= false (v-settlement-location g nil {:target [[1 0] :w]})))
+  (is (= true (v-settlement-location g nil {:target [[1 0] :w]})))
   )
 
 (deftest t-v-road-location

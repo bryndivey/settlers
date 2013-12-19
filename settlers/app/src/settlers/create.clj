@@ -83,8 +83,9 @@
    :cards cards
    :next-move nil})
 
-(defn create-game []
-  (-create-game (shuffle terrains) (shuffle cards)))
+(defn create-game
+  ([] (-create-game (shuffle terrains) (shuffle cards)))
+  ([terrains cards] (-create-game terrains cards)))
 
 (defn add-player
   ([g name]

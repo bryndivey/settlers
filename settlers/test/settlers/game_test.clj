@@ -14,9 +14,9 @@
   (let [g (-> game
               (create/add-player "Bryn"))]
     (is (= (tiles-for-vertex g [[0 0] :n])
-           '({:terrain :forest, :roll 11 :position [0 0]}
-             {:terrain :forest, :roll 10 :position [0 -1]}
-             {:terrain :hill, :roll 9 :position [1 -1]})))
+           '({:terrain :forest, :roll 11, :position [0 0]}
+             {:terrain :hill, :roll 3, :position [-1 0]}
+             {:terrain :pasture, :roll 6, :position [-1 1]})))
 
     (is (= (tiles-for-vertex g [[-2 3] :w])
            '({:terrain :field, :roll 12 :position [-2 2]})))
@@ -27,24 +27,15 @@
     ))
 
 
-(def g (-> game
-           (create/add-player "Bryn")
-           (create/add-player "Mark")
-           
-           (create/add-settlement :bryn [[0 0] :n])
-           (create/add-road :bryn [[0 0] [-1 0]])
-           (create/add-settlement :bryn [[2 -2] :n])
-           (create/add-road :bryn [[1 -2] [1 -1]])
-           
-           (create/add-settlement :mark [[1 1] :n])
-           (create/add-road :mark [[1 1] [0 1]])
-           (create/add-settlement :mark [[-1 0] :w])
-           (create/add-road :bryn [[-1 0] [-2 0]])))
+(def g (create terrains cards))
 
 (deftest t-resources
   (is (= '({:brick 1, :wood 0, :ore 0, :wool 0, :grain 1}
            {:brick 0, :wood 0, :ore 0, :wool 0, :grain 0})
-         (map :resources (vals (:players (do-resource-allocation g 8)))))))
+         (map :resources (vals (:players (do-resource-allocation g 8))))))
+  (is (= '({:brick 0, :wood 1, :ore 0, :wool 0, :grain 0}
+           {:brick 0, :wood 0, :ore 0, :wool 0, :grain 0})
+         (map :resources (vals (:players (do-resource-allocation g 5))))))  )
 
 (deftest t-next-player
   (is (= (next-player g :bryn) :mark))

@@ -75,7 +75,7 @@
         :else (throw (Exception. (str "Invalid direction" d)))))
 
 (defn vertex-to-faces [[[q r] d]]
-  (cond (= d :n) [[q r] [q (- r 1)] [(+ q 1) (- r 1)]]
+  (cond (= d :n) [[q r] [(- q 1) r] [(- q 1) (+ r 1)]]
         (= d :w) [[q r] [(- q 1) r] [q (- r 1)]]
         :else (throw (Exception. (str "Invalid direction" d)))))
 

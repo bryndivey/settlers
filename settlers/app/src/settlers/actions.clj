@@ -17,10 +17,11 @@
 (defn get-action-fn [action type]
   (get-in @action-fns [action type]))
 
-(defn defaction [name & {:keys [validate-fns perform-fn]}]
+(defn defaction [name & {:keys [validate-fns perform-fn available-fn]}]
   (assert perform-fn "Must define a perform-fn")
   (swap! action-fns assoc name {:validate validate-fns
-                                :perform perform-fn}))
+                                :perform perform-fn
+                                :available available-fn}))
 
 
 (defn validators-pass? [vfns game player args]
@@ -89,6 +90,9 @@
     :validate-fns [v-settlement-location
                    (v-required-resources cost )
                    (v-building-number :settlement 5)]
+    :available-fn (fn [g p a]
+                    )
+    
     :perform-fn (fn [g p a]
                   (-> g
                       (add-settlement (:id p) (:target a))

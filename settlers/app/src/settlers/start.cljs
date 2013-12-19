@@ -11,6 +11,11 @@
 
 ;; In this namespace, the application is built and started.
 
+(def terrains [:pasture :pasture :mountain :desert :pasture :hill :field :mountain :field :field :forest :field :forest :hill :mountain :forest :pasture :hill :forest])
+
+(def cards [{:type :road-building} {:type :knight} {:type :victory-point} {:type :knight} {:type :knight} {:type :knight} {:type :knight} {:type :monopoly} {:type :victory-point} {:type :knight} {:type :year-of-plenty} {:type :victory-point} {:type :knight} {:type :victory-point} {:type :monopoly} {:type :knight} {:type :knight} {:type :road-building} {:type :knight} {:type :knight} {:type :knight} {:type :knight} {:type :victory-point} {:type :year-of-plenty} {:type :knight}])
+
+
 (defn create-app [render-config]
   (let [app (app/build behavior/example-app)
         render-fn (push-render/renderer "content" render-config render/log-fn)
@@ -20,7 +25,7 @@
     (p/put-message (:input app)
                    {msg/type :swap
                     msg/topic [:game]
-                    :value (-> (game/create)
+                    :value (-> (game/create terrains cards)
                                (utils/inc-resources :bryn r)
                                (utils/inc-resources :mark r))})
     {:app app :app-model app-model}))
