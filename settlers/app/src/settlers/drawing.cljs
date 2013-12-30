@@ -11,6 +11,8 @@
             [settlers.actions :as actions]
             ))
 
+(def canvas (atom nil))
+
 (def terrains [:pasture :pasture :mountain :desert :pasture :hill :field :mountain :field :field :forest :field :forest :hill :mountain :forest :pasture :hill :forest])
 
 (comment def g (-> (create/create-game)
@@ -216,6 +218,7 @@
 (defn del-edge-selector [i]
   (c/remove! (@edge-selectors i)))
 
+
 (defn select-edge [ctx cb es]
   (let [id (gensym)
         sels (draw-edge-selectors ctx #(do (del-edge-selector id)
@@ -250,6 +253,20 @@
       (c/move! 600 10)))
 
 
+(defn draw-card [ctx move-fn card]
+  (let [t (c/set ctx
+                 (c/set-fill! (c/rect ctx 0 0 100 150) "#FFF")
+                 (c/text ctx 5 130 (str (:type card))))
+        afn (fn [] (.log js/console "CARD PLAYED" (str card)))]
+    (c/set-onclick! t afn)))
+
+
+(defn draw-hand [ctx move-fn hand]
+  (doall (for [[y r] (map-indexed vector (partition 3 3 nil hand))
+               [x c] (map-indexed vector r)]
+           (c/move! (draw-card ctx move-fn c)
+                    (+ 600 (* x 100)) (+ 300 (* y 150))))))
+
 
 (defn draw-game [n g move-fn]
   (dom/destroy-children! n)
@@ -277,14 +294,14 @@
       (let [p (draw-player ctx p)]
         (c/move-to! p 600 (+ 140 (* i 40)))))
 
-    (comment let [vertices (map/all-vertices (game/game-faces g))]
-      (select-vertex ctx #(.log js/console %) vertices))
-
     (draw-next-move ctx (:next-move g))
     (draw-last-move ctx (last (:moves g)))
-    (comment select-edge ctx #(.log js/console %) (map/faces-edges (game/game-faces g)))))
 
-(defn initialize [])
+    (draw-hand ctx move-fn (:hand ((:player (:next-move g)) (:players g))))
+))
+
+(defn initialize []
+  (swap! canvas #(c/get-context "canvas" 1000 600)))
 
 (defn render [g move-fn]
   (draw-game (dom/by-id "canvas") g move-fn))
